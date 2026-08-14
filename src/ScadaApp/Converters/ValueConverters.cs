@@ -105,3 +105,13 @@ public class BoolToVisibilityConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         value is Visibility v && v == Visibility.Visible;
 }
+
+/// <summary>不可见时仍保留布局占位，用于表格操作列对齐</summary>
+public class BoolToHiddenVisibilityConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is true ? Visibility.Visible : Visibility.Hidden;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is Visibility v && v == Visibility.Visible;
+}

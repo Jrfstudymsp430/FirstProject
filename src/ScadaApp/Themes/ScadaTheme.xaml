@@ -8,6 +8,7 @@
     <conv:LogLevelToBrushConverter x:Key="LogLevelToBrush"/>
     <conv:InverseBoolConverter x:Key="InverseBool"/>
     <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
+    <conv:BoolToHiddenVisibilityConverter x:Key="BoolToHiddenVis"/>
 
     <!-- 配色：工业 SCADA 深色 + 青绿强调 -->
     <Color x:Key="ColorBgDeep">#0A0E17</Color>
@@ -338,6 +339,53 @@
     </Style>
 
     <!-- 数据表格 -->
+    <Style x:Key="DataGridHeaderCenter" TargetType="DataGridColumnHeader">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="DataGridHeaderLeft" TargetType="DataGridColumnHeader">
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    </Style>
+
+    <Style x:Key="DataGridCellCenter" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="DataGridCellLeft" TargetType="TextBlock">
+        <Setter Property="HorizontalAlignment" Value="Left"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextAlignment" Value="Left"/>
+    </Style>
+
+    <Style x:Key="TableActionButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="Width" Value="48"/>
+        <Setter Property="Height" Value="28"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <Style x:Key="TableWriteButton" TargetType="Button" BasedOn="{StaticResource TableActionButton}">
+        <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+        <Setter Property="Foreground" Value="{StaticResource Accent}"/>
+        <Setter Property="BorderBrush" Value="#4400D4AA"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#3300D4AA"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="TableDangerButton" TargetType="Button" BasedOn="{StaticResource TableActionButton}">
+        <Setter Property="Foreground" Value="#FF8A80"/>
+        <Setter Property="BorderBrush" Value="#66FF5252"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
     <Style TargetType="DataGrid">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
@@ -350,29 +398,33 @@
         <Setter Property="HeadersVisibility" Value="Column"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
         <Setter Property="CanUserAddRows" Value="False"/>
+        <Setter Property="CanUserResizeColumns" Value="False"/>
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="IsReadOnly" Value="True"/>
-        <Setter Property="RowHeight" Value="42"/>
+        <Setter Property="RowHeight" Value="44"/>
         <Setter Property="CanUserResizeRows" Value="False"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
     </Style>
 
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource BgCard}"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="Padding" Value="10,10"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
     </Style>
 
     <Style TargetType="DataGridCell">
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="12,0"/>
+        <Setter Property="Padding" Value="10,0"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#2200D4AA"/>
+                <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
             </Trigger>
         </Style.Triggers>
@@ -384,7 +436,7 @@
                 <Setter Property="Background" Value="#11FFFFFF"/>
             </Trigger>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="#2200D4AA"/>
+                <Setter Property="Background" Value="#1800D4AA"/>
             </Trigger>
         </Style.Triggers>
     </Style>

@@ -277,52 +277,107 @@
 
                             <DataGrid ItemsSource="{Binding Tags}">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="130"/>
-                                    <DataGridTextColumn Header="从站" Binding="{Binding SlaveId}" Width="55"/>
-                                    <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="150"/>
-                                    <DataGridTextColumn Header="地址" Binding="{Binding Address}" Width="65"/>
-                                    <DataGridTextColumn Header="类型" Binding="{Binding DataType}" Width="75"/>
-                                    <DataGridTemplateColumn Header="当前值" Width="130">
+                                    <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*" MinWidth="90">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderLeft}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellLeft}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="从站" Binding="{Binding SlaveId}" Width="60">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="160">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderLeft}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellLeft}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="地址" Binding="{Binding Address}" Width="60">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="类型" Binding="{Binding DataType}" Width="72">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="当前值" Width="100">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Border Background="#1500D4AA" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
-                                                    <TextBlock Text="{Binding DisplayValue}" FontWeight="Bold" FontSize="14"
-                                                               Foreground="{StaticResource Accent}"/>
+                                                <Border Background="#1500D4AA" CornerRadius="4" Padding="8,4"
+                                                        HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="56">
+                                                    <TextBlock Text="{Binding DisplayValue}" FontWeight="Bold" FontSize="13"
+                                                               Foreground="{StaticResource Accent}"
+                                                               HorizontalAlignment="Center"/>
                                                 </Border>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTemplateColumn Header="质量" Width="65">
+                                    <DataGridTemplateColumn Header="质量" Width="80">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Ellipse Width="10" Height="10"
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Ellipse Width="8" Height="8" VerticalAlignment="Center"
                                                              Fill="{Binding Quality, Converter={StaticResource QualityToBrush}}"/>
-                                                    <TextBlock Text="{Binding Quality}" Margin="6,0,0,0" FontSize="11"
+                                                    <TextBlock Text="{Binding Quality}" Margin="6,0,0,0" FontSize="11" VerticalAlignment="Center"
                                                                Foreground="{StaticResource TextSecondary}"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="110"/>
-                                    <DataGridTemplateColumn Header="操作" Width="180">
+                                    <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="115">
+                                        <DataGridTextColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTextColumn.HeaderStyle>
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTemplateColumn Header="操作" Width="168">
+                                        <DataGridTemplateColumn.HeaderStyle>
+                                            <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
+                                        </DataGridTemplateColumn.HeaderStyle>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Button Content="编辑" Padding="10,5" Margin="0,0,6,0"
-                                                            Style="{StaticResource SecondaryButton}"
+                                                <Grid VerticalAlignment="Center" HorizontalAlignment="Center" Width="156">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="52"/>
+                                                        <ColumnDefinition Width="52"/>
+                                                        <ColumnDefinition Width="52"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button Grid.Column="0" Content="编辑" Style="{StaticResource TableActionButton}"
                                                             Command="{Binding DataContext.EditTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"/>
-                                                    <Button Content="写入" Padding="10,5" Margin="0,0,6,0"
-                                                            Style="{StaticResource SuccessButton}"
+                                                    <Button Grid.Column="1" Content="写入" Style="{StaticResource TableWriteButton}"
                                                             Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"
-                                                            Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}"/>
-                                                    <Button Content="删" Padding="10,5"
-                                                            Style="{StaticResource DangerButton}"
+                                                            Visibility="{Binding IsWritable, Converter={StaticResource BoolToHiddenVis}}"/>
+                                                    <Button Grid.Column="2" Content="删" Style="{StaticResource TableDangerButton}"
                                                             Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"/>
-                                                </StackPanel>
+                                                </Grid>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
