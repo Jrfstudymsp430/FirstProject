@@ -356,6 +356,7 @@
                                                         <TextBlock
                                                             FontSize="13"
                                                             FontWeight="SemiBold"
+                                                            Foreground="Green"
                                                             Text="{Binding Config.Name}" />
                                                     </StackPanel>
                                                     <Border
@@ -407,7 +408,7 @@
                                             CornerRadius="2" />
                                         <TextBlock Style="{StaticResource SectionTitle}" Text="通道参数" />
                                     </StackPanel>
-                                    <primitives:UniformGrid Columns="4" Rows="2">
+                                    <primitives:UniformGrid Columns="4" Rows="1">
                                         <StackPanel Margin="0,0,8,8">
                                             <TextBlock Style="{StaticResource FieldLabel}" Text="通道名称" />
                                             <TextBox Padding="3,0,0,0" Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}" />
@@ -427,18 +428,7 @@
                                             <TextBlock Style="{StaticResource FieldLabel}" Text="轮询间隔 (ms)" />
                                             <TextBox Padding="3,0,0,0" Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}" />
                                         </StackPanel>
-                                        <StackPanel Margin="0,0,8,0">
-                                            <TextBlock Style="{StaticResource FieldLabel}" Text="校验位" />
-                                            <ComboBox ItemsSource="{Binding DataContext.ParityOptions, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding Config.Parity}" />
-                                        </StackPanel>
-                                        <StackPanel Margin="0,0,8,0">
-                                            <TextBlock Style="{StaticResource FieldLabel}" Text="停止位" />
-                                            <ComboBox ItemsSource="{Binding DataContext.StopBitsOptions, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding Config.StopBits}" />
-                                        </StackPanel>
-                                        <StackPanel Margin="0,0,8,0">
-                                            <TextBlock Style="{StaticResource FieldLabel}" Text="数据位" />
-                                            <ComboBox ItemsSource="{Binding DataContext.DataBitsOptions, RelativeSource={RelativeSource AncestorType=Window}}" SelectedItem="{Binding Config.DataBits}" />
-                                        </StackPanel>
+
                                     </primitives:UniformGrid>
                                 </StackPanel>
                             </Border>
