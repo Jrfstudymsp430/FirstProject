@@ -235,8 +235,9 @@ public partial class MainViewModel : ObservableObject
 
         var defaultValue = tag.DisplayValue is "ERR" or "--" ? "0" : StripDisplayUnit(tag.DisplayValue);
         var input = InputDialog.Show(
-            "写入 Modbus 点",
-            $"写入 {tag.Name} ({tag.DataType})",
+            "写入数据",
+            tag.Name,
+            tag.DataType,
             defaultValue);
 
         if (string.IsNullOrWhiteSpace(input)) return;
