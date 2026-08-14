@@ -1,4 +1,5 @@
 using System.IO;
+using System.Reflection;
 using System.Text.Json;
 using ScadaApp.Models;
 
@@ -12,15 +13,39 @@ public static class ConfigStorage
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    public static string ConfigPath =>
+    /// <summary>
+    /// 与 exe 同目录：bin/Debug、bin/Release 或 publish 下的 channels.json。
+    /// </summary>
+    public static string ConfigPath => Path.Combine(AppDirectory, "channels.json");
+
+    private static string AppDirectory
+    {
+        get
+        {
+            var dir = AppContext.BaseDirectory;
+            if (string.IsNullOrWhiteSpace(dir))
+                dir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            return string.IsNullOrWhiteSpace(dir)
+                ? Directory.GetCurrentDirectory()
+                : dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        }
+    }
+
+    private static string LegacyConfigPath =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ScadaApp", "channels.json");
 
     public static List<ChannelConfig> Load()
     {
         try
         {
+            TryMigrateLegacy();
+
             if (!File.Exists(ConfigPath))
-                return CreateDefaultChannels();
+            {
+                var defaults = CreateDefaultChannels();
+                Save(defaults);
+                return defaults;
+            }
 
             var json = File.ReadAllText(ConfigPath);
             var loaded = JsonSerializer.Deserialize<List<ChannelConfig>>(json, JsonOptions) ?? CreateDefaultChannels();
@@ -35,17 +60,34 @@ public static class ConfigStorage
 
     public static void Save(IEnumerable<ChannelConfig> channels)
     {
-        var dir = Path.GetDirectoryName(ConfigPath)!;
-        Directory.CreateDirectory(dir);
-        var json = JsonSerializer.Serialize(channels.ToList(), JsonOptions);
+        var list = channels.ToList();
+        Sanitize(list);
+        Directory.CreateDirectory(AppDirectory);
+        var json = JsonSerializer.Serialize(list, JsonOptions);
         File.WriteAllText(ConfigPath, json);
+    }
+
+    private static void TryMigrateLegacy()
+    {
+        try
+        {
+            if (File.Exists(ConfigPath) || !File.Exists(LegacyConfigPath))
+                return;
+
+            Directory.CreateDirectory(AppDirectory);
+            File.Copy(LegacyConfigPath, ConfigPath, overwrite: false);
+        }
+        catch
+        {
+            // 旧路径迁移失败时忽略，使用默认配置
+        }
     }
 
     private static List<ChannelConfig> CreateDefaultChannels()
     {
         var channel = new ChannelConfig
         {
-            Name = "通道1 - COM1",
+            Name = "通道1",
             PortName = "COM1",
             BaudRate = 9600,
             PollingIntervalMs = 1000,
@@ -77,12 +119,21 @@ public static class ConfigStorage
 
     private static void Sanitize(List<ChannelConfig> channels)
     {
-        foreach (var tag in channels.SelectMany(c => c.Tags))
+        foreach (var channel in channels)
         {
-            if (!Enum.IsDefined(tag.FunctionCode))
-                tag.FunctionCode = ModbusFunctionCode.ReadHoldingRegisters;
-            if (!Enum.IsDefined(tag.DataType))
-                tag.DataType = TagDataType.Float32;
+            channel.Name = TrimOrEmpty(channel.Name);
+            channel.PortName = TrimOrEmpty(channel.PortName);
+            foreach (var tag in channel.Tags)
+            {
+                tag.Name = TrimOrEmpty(tag.Name);
+                tag.Unit = TrimOrEmpty(tag.Unit);
+                if (!Enum.IsDefined(tag.FunctionCode))
+                    tag.FunctionCode = ModbusFunctionCode.ReadHoldingRegisters;
+                if (!Enum.IsDefined(tag.DataType))
+                    tag.DataType = TagDataType.Float32;
+            }
         }
     }
+
+    private static string TrimOrEmpty(string? value) => value?.Trim() ?? string.Empty;
 }

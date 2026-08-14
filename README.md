@@ -13,8 +13,7 @@
 - **实时数据采集**：可配置轮询间隔，显示数据质量与时间戳
 - **读写控制**：功能码 06/16 的点可写入
 - **连接状态**：串口打开成功后界面持续显示「已连接」，直到手动停止
-- **当前时间**：标题栏与状态栏显示系统时间
-- **配置持久化**：`%AppData%\ScadaApp\channels.json`
+- **配置持久化**：与程序同目录的 `channels.json`（`bin/Debug`、`bin/Release` 或 `publish` 下）
 - **通信日志**：连接、读写、异常记录，支持清空
 
 ## 系统要求
@@ -34,6 +33,13 @@ dotnet run --project src/ScadaApp/ScadaApp.csproj
 ```
 
 或在 Visual Studio 中打开 `ScadaApp.sln`，按 F5 运行。
+
+配置文件为程序目录下的 `channels.json`：
+
+- Visual Studio / `dotnet run`：`src/ScadaApp/bin/Debug/net9.0-windows/channels.json`（Release 同理）
+- 发布后：与 `ScadaApp.exe` 同目录（publish 文件夹）
+
+首次启动会自动生成；若以前用过 `%AppData%\ScadaApp\channels.json`，会复制到上述目录。
 
 ## 使用说明
 
