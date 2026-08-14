@@ -87,7 +87,8 @@
                     <TextBox
                         Grid.Row="0"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
+                        Padding="3,0,0,0"
                         Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock
@@ -99,7 +100,7 @@
                         x:Name="PortCombo"
                         Grid.Row="1"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
                         IsEditable="True"
                         Text="{Binding PortName, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -112,7 +113,7 @@
                         x:Name="BaudCombo"
                         Grid.Row="2"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
                         SelectedItem="{Binding BaudRate}" />
 
                     <TextBlock
@@ -123,7 +124,8 @@
                     <TextBox
                         Grid.Row="3"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
+                        Padding="3,0,0,0"
                         Text="{Binding PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}" />
 
                     <TextBlock
@@ -135,7 +137,7 @@
                         x:Name="ParityCombo"
                         Grid.Row="4"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
                         SelectedItem="{Binding Parity}" />
 
                     <TextBlock
@@ -147,7 +149,7 @@
                         x:Name="StopBitsCombo"
                         Grid.Row="5"
                         Grid.Column="1"
-                        Margin="0,0,0,10"
+                        Margin="0,0,0,5"
                         SelectedItem="{Binding StopBits}" />
 
                     <TextBlock
@@ -159,7 +161,7 @@
                         x:Name="DataBitsCombo"
                         Grid.Row="6"
                         Grid.Column="1"
-                        Margin="0,0,0,16"
+                        Margin="0,0,0,5"
                         SelectedItem="{Binding DataBits}" />
                 </Grid>
 

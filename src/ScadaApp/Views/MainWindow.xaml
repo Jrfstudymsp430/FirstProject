@@ -9,9 +9,9 @@
     Height="700"
     MinWidth="900"
     MinHeight="560"
-    Icon="pack://application:,,,/Assets/app.ico"
     Background="{StaticResource BgDark}"
     Closing="Window_Closing"
+    Icon="pack://application:,,,/Assets/app.ico"
     ResizeMode="CanResize"
     WindowStartupLocation="CenterScreen"
     WindowStyle="None">
@@ -422,8 +422,8 @@
                                     </Grid>
 
                                     <DataGrid
-                                        ColumnWidth="*"
                                         HorizontalAlignment="Stretch"
+                                        ColumnWidth="*"
                                         HorizontalScrollBarVisibility="Disabled"
                                         ItemsSource="{Binding Tags}"
                                         RowHeaderWidth="0">
@@ -557,14 +557,17 @@
                                             </DataGridTextColumn>
                                             <DataGridTemplateColumn
                                                 Width="1.8*"
-                                                MinWidth="150"
+                                                MinWidth="180"
                                                 Header="操作">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
                                                 </DataGridTemplateColumn.HeaderStyle>
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                                                        <Grid
+                                                            Margin="0,0,10,0"
+                                                            HorizontalAlignment="Stretch"
+                                                            VerticalAlignment="Center">
                                                             <Grid.ColumnDefinitions>
                                                                 <ColumnDefinition Width="*" />
                                                                 <ColumnDefinition Width="*" />
