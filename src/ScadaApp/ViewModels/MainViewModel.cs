@@ -174,6 +174,31 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void EditChannel()
+    {
+        if (SelectedChannel == null)
+        {
+            MessageDialog.Alert("通道参数", "请先选择一个通道。");
+            return;
+        }
+
+        RefreshPorts();
+        if (!ChannelConfigDialog.Edit(
+                SelectedChannel.Config,
+                AvailablePorts,
+                BaudRates,
+                ParityOptions.Cast<System.IO.Ports.Parity>(),
+                StopBitsOptions.Cast<System.IO.Ports.StopBits>(),
+                DataBitsOptions))
+            return;
+
+        _channelManager.UpdateChannel(SelectedChannel.Config);
+        ConfigStorage.Save(_channelManager.Channels);
+        SelectedChannel.RefreshState();
+        StatusText = $"已更新通道参数: {SelectedChannel.Name}";
+    }
+
+    [RelayCommand]
     private void AddTag()
     {
         if (SelectedChannel == null) return;

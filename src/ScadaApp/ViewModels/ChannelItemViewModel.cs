@@ -15,7 +15,14 @@ public partial class ChannelItemViewModel : ObservableObject
     {
         _channelManager = channelManager;
         Config = config;
-        Config.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Summary));
+        Config.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName is nameof(ChannelConfig.Name) or nameof(ChannelConfig.PortName) or nameof(ChannelConfig.BaudRate))
+            {
+                OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(Summary));
+            }
+        };
     }
 
     public ChannelConfig Config { get; }
