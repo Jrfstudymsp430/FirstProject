@@ -12,6 +12,7 @@ public sealed class ChannelService : IChannelService, IDisposable
     private ModbusRtuClient? _client;
     private CancellationTokenSource? _pollCts;
     private Task? _pollTask;
+    private readonly ConcurrentDictionary<string, TagValue> _tagValues = new();
     private readonly ConcurrentDictionary<string, string> _lastErrors = new();
     private ChannelState _state = ChannelState.Disconnected;
 

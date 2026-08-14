@@ -6,11 +6,11 @@ namespace ScadaApp.Views;
 
 public partial class TagConfigDialog : Window
 {
-    public TagPoint Tag { get; }
+    public TagPoint Point { get; }
 
     public TagConfigDialog(TagPoint tag)
     {
-        Tag = tag;
+        Point = tag;
         InitializeComponent();
 
         FunctionCodeCombo.ItemsSource = new[]
@@ -31,7 +31,7 @@ public partial class TagConfigDialog : Window
             TagDataType.Float32
         };
 
-        DataContext = Tag;
+        DataContext = Point;
     }
 
     private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
