@@ -4,8 +4,8 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         xmlns:vm="clr-namespace:ScadaApp.ViewModels"
         Title="SCADA · Modbus RTU 多通道采集系统"
-        Height="820" Width="1360"
-        MinHeight="640" MinWidth="1024"
+        Height="700" Width="1120"
+        MinHeight="560" MinWidth="900"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Background="{StaticResource BgDark}"
@@ -33,7 +33,7 @@
             </Grid.RowDefinitions>
 
             <!-- 深色标题栏 -->
-            <Grid Grid.Row="0" Background="#111827"
+            <Grid Grid.Row="0" Background="#111827" ClipToBounds="True"
                   MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1"/>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
@@ -48,13 +48,19 @@
                     <TextBlock Text="SCADA · Modbus RTU 多通道采集系统"
                                Foreground="{StaticResource TextSecondary}" FontSize="12"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Style="{StaticResource WindowChromeButton}" Content="─"
-                            Click="MinimizeButton_Click" ToolTip="最小化"/>
-                    <Button Style="{StaticResource WindowChromeButton}" Content="□"
-                            Click="MaximizeButton_Click" ToolTip="最大化"/>
-                    <Button Style="{StaticResource WindowCloseButton}" Content="✕"
-                            Click="CloseButton_Click" ToolTip="关闭"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Button x:Name="MinimizeButton" Style="{StaticResource WindowChromeButton}"
+                            Click="MinimizeButton_Click" ToolTip="最小化">
+                        <Path Style="{StaticResource WindowChromeIcon}" Data="M0,5 H10"/>
+                    </Button>
+                    <Button x:Name="MaximizeButton" Style="{StaticResource WindowChromeButton}"
+                            Click="MaximizeButton_Click" ToolTip="最大化">
+                        <Path x:Name="MaximizeIcon" Style="{StaticResource WindowChromeIcon}" Data="M0,0 H9 V9 H0 Z"/>
+                    </Button>
+                    <Button x:Name="CloseButton" Style="{StaticResource WindowCloseButton}"
+                            Click="CloseButton_Click" ToolTip="关闭">
+                        <Path Style="{StaticResource WindowChromeIcon}" Data="M0,0 L10,10 M10,0 L0,10"/>
+                    </Button>
                 </StackPanel>
             </Grid>
 
@@ -275,7 +281,7 @@
                                         Command="{Binding AddTagCommand}" Style="{StaticResource SecondaryButton}"/>
                             </Grid>
 
-                            <DataGrid ItemsSource="{Binding Tags}">
+                            <DataGrid ItemsSource="{Binding Tags}" RowHeaderWidth="0">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="*" MinWidth="90">
                                         <DataGridTextColumn.HeaderStyle>

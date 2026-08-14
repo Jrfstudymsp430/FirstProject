@@ -66,14 +66,24 @@
     </Style>
 
     <!-- 自定义标题栏按钮 -->
+    <Style x:Key="WindowChromeIcon" TargetType="Path">
+        <Setter Property="Width" Value="10"/>
+        <Setter Property="Height" Value="10"/>
+        <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
+        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+    </Style>
+
     <Style x:Key="WindowChromeButton" TargetType="Button">
-        <Setter Property="Width" Value="46"/>
+        <Setter Property="Width" Value="44"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Padding" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -83,18 +93,52 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgElevated}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgCard}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
-
-    <Style x:Key="WindowCloseButton" TargetType="Button" BasedOn="{StaticResource WindowChromeButton}">
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="#FFE81123"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="WindowCloseButton" TargetType="Button">
+        <Setter Property="Width" Value="44"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FFE81123"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="#FFC50F1F"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="Foreground" Value="White"/>
             </Trigger>
         </Style.Triggers>
@@ -468,11 +512,37 @@
     </Style>
 
     <!-- 数据表格 -->
-    <Style x:Key="DataGridHeaderCenter" TargetType="DataGridColumnHeader">
+    <Style x:Key="DataGridHeaderBase" TargetType="DataGridColumnHeader">
+        <Setter Property="Background" Value="{StaticResource BgCard}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="Padding" Value="10,10"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="DataGridColumnHeader">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderBase}"/>
+
+    <Style x:Key="DataGridHeaderCenter" TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderBase}">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
 
-    <Style x:Key="DataGridHeaderLeft" TargetType="DataGridColumnHeader">
+    <Style x:Key="DataGridHeaderLeft" TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderBase}">
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
     </Style>
 
@@ -533,17 +603,6 @@
         <Setter Property="RowHeight" Value="44"/>
         <Setter Property="CanUserResizeRows" Value="False"/>
         <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
-    </Style>
-
-    <Style TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="{StaticResource BgCard}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        <Setter Property="Padding" Value="10,10"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-        <Setter Property="FontWeight" Value="SemiBold"/>
-        <Setter Property="FontSize" Value="12"/>
-        <Setter Property="HorizontalContentAlignment" Value="Left"/>
     </Style>
 
     <Style TargetType="DataGridCell">
