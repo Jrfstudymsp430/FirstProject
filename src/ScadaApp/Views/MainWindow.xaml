@@ -33,10 +33,11 @@
             </Grid.RowDefinitions>
 
             <!-- 深色标题栏 -->
-            <Grid Grid.Row="0" Background="#111827" ClipToBounds="True"
-                  MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid Grid.Row="0" Background="#111827" ClipToBounds="True">
                 <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1"/>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,140,0"
+                            Background="Transparent"
+                            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                     <Border Width="14" Height="14" CornerRadius="3" Margin="0,0,8,0">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -48,16 +49,20 @@
                     <TextBlock Text="SCADA · Modbus RTU 多通道采集系统"
                                Foreground="{StaticResource TextSecondary}" FontSize="12"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
+                            Panel.ZIndex="1">
                     <Button x:Name="MinimizeButton" Style="{StaticResource WindowChromeButton}"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Click="MinimizeButton_Click" ToolTip="最小化">
                         <Path Style="{StaticResource WindowChromeIcon}" Data="M0,5 H10"/>
                     </Button>
                     <Button x:Name="MaximizeButton" Style="{StaticResource WindowChromeButton}"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Click="MaximizeButton_Click" ToolTip="最大化">
                         <Path x:Name="MaximizeIcon" Style="{StaticResource WindowChromeIcon}" Data="M0,0 H9 V9 H0 Z"/>
                     </Button>
                     <Button x:Name="CloseButton" Style="{StaticResource WindowCloseButton}"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True"
                             Click="CloseButton_Click" ToolTip="关闭">
                         <Path Style="{StaticResource WindowChromeIcon}" Data="M0,0 L10,10 M10,0 L0,10"/>
                     </Button>
