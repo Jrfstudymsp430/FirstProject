@@ -234,7 +234,7 @@
                             <primitives:UniformGrid Columns="4" Rows="2">
                                 <StackPanel Margin="0,0,8,8">
                                     <TextBlock Text="通道名称" Style="{StaticResource FieldLabel}"/>
-                                    <TextBox Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                    <TextBox Padding="3,0,0,0" Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,0,8,8">
                                     <TextBlock Text="串口" Style="{StaticResource FieldLabel}"/>
@@ -248,7 +248,7 @@
                                 </StackPanel>
                                 <StackPanel Margin="0,0,0,8">
                                     <TextBlock Text="轮询间隔 (ms)" Style="{StaticResource FieldLabel}"/>
-                                    <TextBox Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}"/>
+                    <TextBox Padding="3,0,0,0" Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
                                 <StackPanel Margin="0,0,8,0">
                                     <TextBlock Text="校验位" Style="{StaticResource FieldLabel}"/>
@@ -326,7 +326,7 @@
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTemplateColumn Header="当前值" Width="100">
+                                    <DataGridTemplateColumn Header="当前值" Width="120">
                                         <DataGridTemplateColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
                                         </DataGridTemplateColumn.HeaderStyle>
@@ -334,7 +334,7 @@
                                             <DataTemplate>
                                                 <Border Background="#1500D4AA" CornerRadius="4" Padding="8,4"
                                                         HorizontalAlignment="Center" VerticalAlignment="Center" MinWidth="56">
-                                                    <TextBlock Text="{Binding DisplayValue}" FontWeight="Bold" FontSize="13"
+                                                    <TextBlock Text="{Binding DisplayValue}"  Width="80"  FontWeight="Bold" FontSize="13"
                                                                Foreground="{StaticResource Accent}"
                                                                HorizontalAlignment="Center"/>
                                                 </Border>
@@ -383,7 +383,7 @@
                                                             Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"
                                                             Visibility="{Binding IsWritable, Converter={StaticResource BoolToHiddenVis}}"/>
-                                                    <Button Grid.Column="2" Content="删" Style="{StaticResource TableDangerButton}"
+                                                    <Button Grid.Column="2" Content="删除" Style="{StaticResource TableDangerButton}"
                                                             Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                             CommandParameter="{Binding}"/>
                                                 </Grid>
