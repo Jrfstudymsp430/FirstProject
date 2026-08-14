@@ -2,194 +2,337 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:ScadaApp.ViewModels"
-        Title="SCADA - Modbus RTU 多通道采集系统"
-        Height="780" Width="1280"
-        MinHeight="600" MinWidth="960"
+        Title="SCADA · Modbus RTU 多通道采集系统"
+        Height="820" Width="1360"
+        MinHeight="640" MinWidth="1024"
         WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
         <vm:MainViewModel/>
     </Window.DataContext>
 
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="180"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Grid>
+        <!-- 背景装饰 -->
+        <Canvas IsHitTestVisible="False" Opacity="0.06">
+            <Ellipse Canvas.Right="-120" Canvas.Top="-80" Width="400" Height="400" Fill="{StaticResource Accent}"/>
+            <Ellipse Canvas.Left="-100" Canvas.Bottom="-100" Width="350" Height="350" Fill="{StaticResource AccentBlue}"/>
+        </Canvas>
 
-        <!-- 工具栏 -->
-        <Border Grid.Row="0" Background="{StaticResource BgPanel}" CornerRadius="6" Padding="12" Margin="0,0,0,10">
-            <DockPanel LastChildFill="False">
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
-                    <TextBlock Text="SCADA" FontSize="20" FontWeight="Bold" Foreground="{StaticResource Accent}" VerticalAlignment="Center"/>
-                    <TextBlock Text="Modbus RTU 多通道" Margin="12,0,0,0" VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}"/>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" DockPanel.Dock="Right" HorizontalAlignment="Right">
-                    <Button Content="刷新串口" Command="{Binding RefreshPortsCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
-                    <Button Content="保存配置" Command="{Binding SaveConfigCommand}" Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
-                    <Button Content="启动全部" Command="{Binding StartAllCommand}" Margin="0,0,8,0"/>
-                    <Button Content="停止全部" Command="{Binding StopAllCommand}" Style="{StaticResource DangerButton}"/>
-                </StackPanel>
-            </DockPanel>
-        </Border>
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <!-- 主内容 -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="280"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <!-- 顶部标题栏 -->
+            <Border Grid.Row="0" CornerRadius="12" Padding="20,16" Margin="0,0,0,12"
+                    Background="{StaticResource HeaderGradientBrush}"
+                    BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                <Border.Effect>
+                    <DropShadowEffect Color="#000" BlurRadius="20" ShadowDepth="3" Opacity="0.4"/>
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <!-- 通道列表 -->
-            <Border Grid.Column="0" Background="{StaticResource BgPanel}" CornerRadius="6" Padding="10">
+                    <!-- Logo -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border Width="44" Height="44" CornerRadius="10" Margin="0,0,14,0">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#00D4AA" Offset="0"/>
+                                    <GradientStop Color="#00B4D8" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <TextBlock Text="⚡" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="SCADA 采集系统" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                            <TextBlock Text="Modbus RTU · 多通道并行通信" FontSize="12"
+                                       Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 统计卡片 -->
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="通道" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding ChannelCount}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Accent}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="在线" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding RunningChannelCount}" FontSize="22" FontWeight="Bold" Foreground="#00D4AA"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="数据点" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding TagCount}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}">
+                            <StackPanel>
+                                <TextBlock Text="正常" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding GoodTagCount}" FontSize="22" FontWeight="Bold" Foreground="#00D4AA"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- 工具按钮 -->
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="⟳ 刷新串口" Command="{Binding RefreshPortsCommand}"
+                                Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
+                        <Button Content="💾 保存" Command="{Binding SaveConfigCommand}"
+                                Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
+                        <Button Content="▶ 启动全部" Command="{Binding StartAllCommand}"
+                                Style="{StaticResource SuccessButton}" Margin="0,0,8,0"/>
+                        <Button Content="■ 停止全部" Command="{Binding StopAllCommand}"
+                                Style="{StaticResource DangerButton}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- 分隔线 -->
+            <Border Grid.Row="1" Height="1" Background="{StaticResource BorderColor}" Margin="0,0,0,12" Opacity="0.5"/>
+
+            <!-- 主内容区 -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="300"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- 左侧：通道列表 -->
+                <Border Grid.Column="0" Style="{StaticResource PanelCard}">
+                    <DockPanel>
+                        <Grid DockPanel.Dock="Top" Margin="0,0,0,14">
+                            <TextBlock Text="通信通道" Style="{StaticResource SectionTitle}" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Content="+" Style="{StaticResource IconButton}" Margin="0,0,6,0"
+                                        Command="{Binding AddChannelCommand}" ToolTip="添加通道"/>
+                                <Button Content="−" Style="{StaticResource IconButton}"
+                                        Command="{Binding RemoveChannelCommand}" ToolTip="删除通道"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <StackPanel DockPanel.Dock="Bottom" Margin="0,14,0,0">
+                            <Button Content="▶  启动通道" Command="{Binding StartChannelCommand}"
+                                    Style="{StaticResource SuccessButton}" Margin="0,0,0,8"/>
+                            <Button Content="■  停止通道" Command="{Binding StopChannelCommand}"
+                                    Style="{StaticResource SecondaryButton}"/>
+                        </StackPanel>
+
+                        <ListBox ItemsSource="{Binding Channels}"
+                                 SelectedItem="{Binding SelectedChannel}"
+                                 Style="{StaticResource ChannelListBox}"
+                                 ItemContainerStyle="{StaticResource ChannelListItem}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Ellipse Width="8" Height="8" Margin="0,0,8,0" VerticalAlignment="Center"
+                                                         Fill="{Binding State, Converter={StaticResource ChannelStateToBrush}}">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect Color="#00D4AA" BlurRadius="6" ShadowDepth="0" Opacity="0.8"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"/>
+                                            </StackPanel>
+                                            <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                    Background="#2200D4AA" CornerRadius="4" Padding="6,2">
+                                                <TextBlock Text="{Binding State, Converter={StaticResource ChannelStateToLabel}}"
+                                                           FontSize="10" Foreground="{StaticResource Accent}"/>
+                                            </Border>
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Margin="16,6,0,0">
+                                            <TextBlock Text="🔌" FontSize="11" Margin="0,0,4,0"/>
+                                            <TextBlock Text="{Binding Summary}" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+
+                <!-- 右侧 -->
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- 通道参数 -->
+                    <Border Grid.Row="0" Style="{StaticResource PanelCard}" Margin="0,0,0,12"
+                            DataContext="{Binding SelectedChannel}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="3" Height="16" CornerRadius="2" Background="{StaticResource AccentBarBrush}" Margin="0,0,10,0"/>
+                                <TextBlock Text="通道参数" Style="{StaticResource SectionTitle}"/>
+                            </StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="12"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="通道名称" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="串口" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.AvailablePorts, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              Text="{Binding Config.PortName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="4">
+                                    <TextBlock Text="波特率" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.BaudRates, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedItem="{Binding Config.BaudRate}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="6">
+                                    <TextBlock Text="轮询间隔 (ms)" Style="{StaticResource FieldLabel}"/>
+                                    <TextBox Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- 实时数据 -->
+                    <Border Grid.Row="1" Style="{StaticResource PanelCard}">
+                        <DockPanel>
+                            <Grid DockPanel.Dock="Top" Margin="0,0,0,12">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Border Width="3" Height="16" CornerRadius="2" Background="{StaticResource AccentBarBrush}" Margin="0,0,10,0"/>
+                                    <TextBlock Text="实时数据点" Style="{StaticResource SectionTitle}"/>
+                                    <Border Background="#2200B4D8" CornerRadius="10" Padding="8,3" Margin="12,0,0,0">
+                                        <TextBlock Text="{Binding TagCount, StringFormat={}{0} 点}" FontSize="11" Foreground="{StaticResource AccentBlue}"/>
+                                    </Border>
+                                </StackPanel>
+                                <Button Content="＋ 添加标签" HorizontalAlignment="Right"
+                                        Command="{Binding AddTagCommand}" Style="{StaticResource SecondaryButton}"/>
+                            </Grid>
+
+                            <DataGrid ItemsSource="{Binding Tags}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="130"/>
+                                    <DataGridTextColumn Header="从站" Binding="{Binding SlaveId}" Width="55"/>
+                                    <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="150"/>
+                                    <DataGridTextColumn Header="地址" Binding="{Binding Address}" Width="65"/>
+                                    <DataGridTextColumn Header="类型" Binding="{Binding DataType}" Width="75"/>
+                                    <DataGridTemplateColumn Header="当前值" Width="130">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1500D4AA" CornerRadius="4" Padding="8,4" HorizontalAlignment="Left">
+                                                    <TextBlock Text="{Binding DisplayValue}" FontWeight="Bold" FontSize="14"
+                                                               Foreground="{StaticResource Accent}"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="质量" Width="65">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Ellipse Width="10" Height="10"
+                                                             Fill="{Binding Quality, Converter={StaticResource QualityToBrush}}"/>
+                                                    <TextBlock Text="{Binding Quality}" Margin="6,0,0,0" FontSize="11"
+                                                               Foreground="{StaticResource TextSecondary}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="110"/>
+                                    <DataGridTemplateColumn Header="操作" Width="180">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="编辑" Padding="10,5" Margin="0,0,6,0"
+                                                            Style="{StaticResource SecondaryButton}"
+                                                            Command="{Binding DataContext.EditTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"/>
+                                                    <Button Content="写入" Padding="10,5" Margin="0,0,6,0"
+                                                            Style="{StaticResource SuccessButton}"
+                                                            Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"
+                                                            Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}"/>
+                                                    <Button Content="删" Padding="10,5"
+                                                            Style="{StaticResource DangerButton}"
+                                                            Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            CommandParameter="{Binding}"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <!-- 通信日志 -->
+            <Border Grid.Row="3" Style="{StaticResource PanelCard}" Margin="0,12,0,12" Padding="14,12">
                 <DockPanel>
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBlock Text="通信通道" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                        <Button Content="+" Width="32" Padding="0" Margin="8,0,0,0" Command="{Binding AddChannelCommand}"/>
-                        <Button Content="-" Width="32" Padding="0" Margin="4,0,0,0"
-                                Style="{StaticResource DangerButton}" Command="{Binding RemoveChannelCommand}"/>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Border Width="3" Height="14" CornerRadius="2" Background="{StaticResource AccentBarBrush}" Margin="0,0,10,0"/>
+                        <TextBlock Text="通信日志" Style="{StaticResource SectionTitle}"/>
                     </StackPanel>
-
-                    <StackPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
-                        <Button Content="启动通道" Command="{Binding StartChannelCommand}" Margin="0,0,0,6"/>
-                        <Button Content="停止通道" Command="{Binding StopChannelCommand}" Style="{StaticResource SecondaryButton}"/>
-                    </StackPanel>
-
-                    <ListBox ItemsSource="{Binding Channels}"
-                             SelectedItem="{Binding SelectedChannel}"
-                             BorderThickness="0">
+                    <ListBox ItemsSource="{Binding Logs}"
+                             Style="{StaticResource LogListBox}"
+                             ItemContainerStyle="{StaticResource LogListItem}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Margin="4">
-                                    <StackPanel Orientation="Horizontal">
-                                        <Ellipse Width="10" Height="10" Margin="0,0,8,0"
-                                                 Fill="{Binding State, Converter={StaticResource ChannelStateToBrush}}"/>
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding Summary}" Foreground="{StaticResource TextSecondary}" FontSize="11" Margin="18,2,0,0"/>
-                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Timestamp, StringFormat=HH:mm:ss}"
+                                               Foreground="{StaticResource TextSecondary}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Level}" FontWeight="SemiBold"
+                                               Foreground="{Binding Level, Converter={StaticResource LogLevelToBrush}}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding ChannelName}"
+                                               Foreground="{StaticResource AccentBlue}"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding Message}"
+                                               Foreground="{StaticResource TextPrimary}"/>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </DockPanel>
             </Border>
 
-            <!-- 右侧：配置 + 实时数据 -->
-            <Grid Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
-                <!-- 通道参数 -->
-                <Border Grid.Row="0" Background="{StaticResource BgPanel}" CornerRadius="6" Padding="12" Margin="0,0,0,10"
-                        DataContext="{Binding SelectedChannel}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                            <TextBlock Text="通道名称" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
-                            <TextBox Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="0,0,8,0">
-                            <TextBlock Text="串口" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
-                            <ComboBox ItemsSource="{Binding DataContext.AvailablePorts, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      Text="{Binding Config.PortName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Margin="0,0,8,0">
-                            <TextBlock Text="波特率" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
-                            <ComboBox ItemsSource="{Binding DataContext.BaudRates, RelativeSource={RelativeSource AncestorType=Window}}"
-                                      SelectedItem="{Binding Config.BaudRate}"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="3">
-                            <TextBlock Text="轮询间隔(ms)" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
-                            <TextBox Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
-
-                <!-- 标签数据表 -->
-                <Border Grid.Row="1" Background="{StaticResource BgPanel}" CornerRadius="6" Padding="10">
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
-                            <TextBlock Text="实时数据点" FontWeight="SemiBold" VerticalAlignment="Center"/>
-                            <Button Content="添加标签" Margin="12,0,0,0" Command="{Binding AddTagCommand}"/>
-                        </StackPanel>
-
-                        <DataGrid ItemsSource="{Binding Tags}">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="名称" Binding="{Binding Name}" Width="120"/>
-                                <DataGridTextColumn Header="从站" Binding="{Binding SlaveId}" Width="50"/>
-                                <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="140"/>
-                                <DataGridTextColumn Header="地址" Binding="{Binding Address}" Width="60"/>
-                                <DataGridTextColumn Header="类型" Binding="{Binding DataType}" Width="70"/>
-                                <DataGridTextColumn Header="当前值" Binding="{Binding DisplayValue}" Width="120">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="FontWeight" Value="Bold"/>
-                                            <Setter Property="FontSize" Value="14"/>
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                                <DataGridTemplateColumn Header="质量" Width="60">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Ellipse Width="12" Height="12"
-                                                     Fill="{Binding Quality, Converter={StaticResource QualityToBrush}}"
-                                                     HorizontalAlignment="Center"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="100"/>
-                                <DataGridTemplateColumn Header="操作" Width="160">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Button Content="编辑" Padding="8,4" Margin="0,0,4,0" Style="{StaticResource SecondaryButton}"
-                                                        Command="{Binding DataContext.EditTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                        CommandParameter="{Binding}"/>
-                                                <Button Content="写入" Padding="8,4" Margin="0,0,4,0"
-                                                        Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                        CommandParameter="{Binding}"
-                                                        Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}"/>
-                                                <Button Content="删除" Padding="8,4" Style="{StaticResource DangerButton}"
-                                                        Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                        CommandParameter="{Binding}"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
-                </Border>
-            </Grid>
+            <!-- 状态栏 -->
+            <Border Grid.Row="4" CornerRadius="8" Padding="14,8"
+                    Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse Width="8" Height="8" Fill="{StaticResource Accent}" Margin="0,0,8,0"/>
+                        <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource TextSecondary}"/>
+                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
+                               Foreground="{StaticResource TextSecondary}" FontSize="11"
+                               Text="Modbus RTU · SCADA v1.0"/>
+                </Grid>
+            </Border>
         </Grid>
-
-        <!-- 日志 -->
-        <Border Grid.Row="2" Background="{StaticResource BgPanel}" CornerRadius="6" Padding="10" Margin="0,10,0,10">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="通信日志" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                <ListBox ItemsSource="{Binding Logs}" BorderThickness="0" FontFamily="Consolas" FontSize="12">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Display}"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </DockPanel>
-        </Border>
-
-        <!-- 状态栏 -->
-        <Border Grid.Row="3" Background="{StaticResource BgCard}" CornerRadius="4" Padding="10,6">
-            <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource TextSecondary}"/>
-        </Border>
     </Grid>
 </Window>

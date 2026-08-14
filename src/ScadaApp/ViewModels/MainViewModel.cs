@@ -16,6 +16,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private ChannelItemViewModel? _selectedChannel;
     [ObservableProperty] private string _statusText = "就绪";
     [ObservableProperty] private bool _isGlobalRunning;
+    [ObservableProperty] private int _channelCount;
+    [ObservableProperty] private int _runningChannelCount;
+    [ObservableProperty] private int _tagCount;
+    [ObservableProperty] private int _goodTagCount;
 
     public ObservableCollection<ChannelItemViewModel> Channels { get; } = new();
     public ObservableCollection<TagItemViewModel> Tags { get; } = new();
@@ -46,6 +50,7 @@ public partial class MainViewModel : ObservableObject
     partial void OnSelectedChannelChanged(ChannelItemViewModel? value)
     {
         LoadTagsForChannel(value);
+        RefreshSummary();
     }
 
     [RelayCommand]
@@ -97,6 +102,7 @@ public partial class MainViewModel : ObservableObject
             StatusText = $"正在启动 {SelectedChannel.Name}...";
             await _channelManager.StartChannelAsync(SelectedChannel.Id);
             SelectedChannel.RefreshState();
+            RefreshSummary();
             StatusText = $"{SelectedChannel.Name} 已启动";
         }
         catch (Exception ex)
@@ -113,6 +119,7 @@ public partial class MainViewModel : ObservableObject
 
         await _channelManager.StopChannelAsync(SelectedChannel.Id);
         SelectedChannel.RefreshState();
+        RefreshSummary();
         StatusText = $"{SelectedChannel.Name} 已停止";
     }
 
@@ -123,6 +130,7 @@ public partial class MainViewModel : ObservableObject
         await _channelManager.StartAllAsync();
         foreach (var ch in Channels) ch.RefreshState();
         IsGlobalRunning = true;
+        RefreshSummary();
         StatusText = "所有通道已启动";
     }
 
@@ -132,6 +140,7 @@ public partial class MainViewModel : ObservableObject
         await _channelManager.StopAllAsync();
         foreach (var ch in Channels) ch.RefreshState();
         IsGlobalRunning = false;
+        RefreshSummary();
         StatusText = "所有通道已停止";
     }
 
@@ -236,12 +245,17 @@ public partial class MainViewModel : ObservableObject
             vm.RefreshState();
             Channels.Add(vm);
         }
+        RefreshSummary();
     }
 
     private void LoadTagsForChannel(ChannelItemViewModel? channel)
     {
         Tags.Clear();
-        if (channel == null) return;
+        if (channel == null)
+        {
+            RefreshSummary();
+            return;
+        }
 
         foreach (var tag in channel.Config.Tags)
         {
@@ -251,6 +265,7 @@ public partial class MainViewModel : ObservableObject
                 vm.Update(value);
             Tags.Add(vm);
         }
+        RefreshSummary();
     }
 
     private void UpdateTagValue(TagValue value)
@@ -261,6 +276,15 @@ public partial class MainViewModel : ObservableObject
         var channel = Channels.FirstOrDefault(c =>
             c.Config.Tags.Any(t => t.Id == value.TagId));
         channel?.RefreshState();
+        RefreshSummary();
+    }
+
+    private void RefreshSummary()
+    {
+        ChannelCount = Channels.Count;
+        RunningChannelCount = Channels.Count(c => c.IsRunning);
+        TagCount = Tags.Count;
+        GoodTagCount = Tags.Count(t => t.Quality == "Good");
     }
 
     private void AddLog(LogEntry log)
