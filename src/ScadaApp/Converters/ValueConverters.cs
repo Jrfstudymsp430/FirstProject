@@ -162,7 +162,7 @@ public class TimestampToTextConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         if (value is DateTime dt && dt != default && dt != DateTime.MinValue)
-            return dt.ToString("HH:mm:ss.fff");
+            return dt.ToString("HH:mm:ss");
         return "--";
     }
 
