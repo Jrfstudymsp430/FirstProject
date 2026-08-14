@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ScadaApp.Models;
 
@@ -15,23 +16,27 @@ public partial class TagConfigDialog : Window
 
         FunctionCodeCombo.ItemsSource = new[]
         {
-            ModbusFunctionCode.ReadCoils,
-            ModbusFunctionCode.ReadDiscreteInputs,
             ModbusFunctionCode.ReadHoldingRegisters,
-            ModbusFunctionCode.ReadInputRegisters
+            ModbusFunctionCode.WriteSingleRegister,
+            ModbusFunctionCode.WriteMultipleRegisters
         };
 
         DataTypeCombo.ItemsSource = new[]
         {
-            TagDataType.Bool,
-            TagDataType.Int16,
-            TagDataType.UInt16,
-            TagDataType.Int32,
-            TagDataType.UInt32,
-            TagDataType.Float32
+            TagDataType.Float32,
+            TagDataType.UInt16
         };
 
         DataContext = Point;
+        FunctionCodeCombo.SelectionChanged += FunctionCodeCombo_SelectionChanged;
+    }
+
+    private void FunctionCodeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (FunctionCodeCombo.SelectedItem is ModbusFunctionCode.WriteMultipleRegisters)
+            Point.DataType = TagDataType.Float32;
+        else if (FunctionCodeCombo.SelectedItem is ModbusFunctionCode.WriteSingleRegister)
+            Point.DataType = TagDataType.UInt16;
     }
 
     private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

@@ -93,18 +93,12 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            object raw = tag.FunctionCode switch
-            {
-                ModbusFunctionCode.ReadCoils =>
-                    (await Task.Run(() => _master!.ReadCoils(tag.SlaveId, tag.Address, 1), cancellationToken).ConfigureAwait(false))[0],
-                ModbusFunctionCode.ReadDiscreteInputs =>
-                    (await Task.Run(() => _master!.ReadInputs(tag.SlaveId, tag.Address, 1), cancellationToken).ConfigureAwait(false))[0],
-                ModbusFunctionCode.ReadHoldingRegisters =>
-                    ParseRegisters(await Task.Run(() => _master!.ReadHoldingRegisters(tag.SlaveId, tag.Address, tag.RegisterCount), cancellationToken).ConfigureAwait(false), tag.DataType),
-                ModbusFunctionCode.ReadInputRegisters =>
-                    ParseRegisters(await Task.Run(() => _master!.ReadInputRegisters(tag.SlaveId, tag.Address, tag.RegisterCount), cancellationToken).ConfigureAwait(false), tag.DataType),
-                _ => throw new NotSupportedException($"不支持的功能码: {tag.FunctionCode}")
-            };
+            object raw;
+            // 采集统一使用 03 读保持寄存器
+            var registers = await Task.Run(
+                () => _master!.ReadHoldingRegisters(tag.SlaveId, tag.Address, tag.RegisterCount),
+                cancellationToken).ConfigureAwait(false);
+            raw = ParseRegisters(registers, tag.DataType);
 
             result.RawValue = raw;
             result.DisplayValue = FormatValue(raw, tag);
@@ -137,31 +131,18 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         {
             switch (tag.FunctionCode)
             {
-                case ModbusFunctionCode.ReadCoils:
-                case ModbusFunctionCode.WriteSingleCoil:
-                    var coilValue = Convert.ToBoolean(value);
-                    await Task.Run(() => _master!.WriteSingleCoil(tag.SlaveId, tag.Address, coilValue), cancellationToken).ConfigureAwait(false);
+                case ModbusFunctionCode.WriteSingleRegister:
+                    var reg = Convert.ToUInt16(value);
+                    await Task.Run(() => _master!.WriteSingleRegister(tag.SlaveId, tag.Address, reg), cancellationToken).ConfigureAwait(false);
                     break;
 
-                case ModbusFunctionCode.ReadHoldingRegisters:
-                case ModbusFunctionCode.WriteSingleRegister:
-                    if (tag.DataType == TagDataType.Bool)
-                        throw new NotSupportedException("Bool 类型请使用线圈写入");
-
-                    if (tag.RegisterCount == 1)
-                    {
-                        var reg = Convert.ToUInt16(value);
-                        await Task.Run(() => _master!.WriteSingleRegister(tag.SlaveId, tag.Address, reg), cancellationToken).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        var registers = EncodeRegisters(value, tag.DataType);
-                        await Task.Run(() => _master!.WriteMultipleRegisters(tag.SlaveId, tag.Address, registers), cancellationToken).ConfigureAwait(false);
-                    }
+                case ModbusFunctionCode.WriteMultipleRegisters:
+                    var registers = EncodeRegisters(value, tag.DataType);
+                    await Task.Run(() => _master!.WriteMultipleRegisters(tag.SlaveId, tag.Address, registers), cancellationToken).ConfigureAwait(false);
                     break;
 
                 default:
-                    throw new NotSupportedException($"写入不支持功能码: {tag.FunctionCode}");
+                    throw new NotSupportedException("当前点为只读（功能码 03），不可写入");
             }
         }
         finally
@@ -174,12 +155,8 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     {
         return dataType switch
         {
-            TagDataType.Bool => registers[0] != 0,
-            TagDataType.Int16 => (short)registers[0],
             TagDataType.UInt16 => registers[0],
-            TagDataType.Int32 => unchecked((int)(((uint)registers[0] << 16) | registers[1])),
-            TagDataType.UInt32 => ((uint)registers[0] << 16) | registers[1],
-            TagDataType.Float32 => BitConverter.ToSingle(BitConverter.GetBytes(((uint)registers[0] << 16) | registers[1]), 0),
+            TagDataType.Float32 => RegistersToFloatCdab(registers),
             _ => registers[0]
         };
     }
@@ -188,24 +165,41 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     {
         return dataType switch
         {
-            TagDataType.Int32 or TagDataType.UInt32 =>
-                SplitToRegisters(Convert.ToUInt32(value)),
-            TagDataType.Float32 =>
-                SplitToRegisters(BitConverter.ToUInt32(BitConverter.GetBytes(Convert.ToSingle(value)))),
+            TagDataType.Float32 => FloatToRegistersCdab(Convert.ToSingle(value)),
             _ => new[] { Convert.ToUInt16(value) }
         };
     }
 
-    private static ushort[] SplitToRegisters(uint value)
+    /// <summary>
+    /// CDAB：第一个寄存器为 CD（低字），第二个为 AB（高字）。
+    /// </summary>
+    private static float RegistersToFloatCdab(ushort[] registers)
     {
-        return new[] { (ushort)(value >> 16), (ushort)(value & 0xFFFF) };
+        var bytes = new[]
+        {
+            (byte)(registers[1] >> 8),
+            (byte)(registers[1] & 0xFF),
+            (byte)(registers[0] >> 8),
+            (byte)(registers[0] & 0xFF)
+        };
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+        return BitConverter.ToSingle(bytes, 0);
+    }
+
+    private static ushort[] FloatToRegistersCdab(float value)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+
+        var cd = (ushort)((bytes[2] << 8) | bytes[3]);
+        var ab = (ushort)((bytes[0] << 8) | bytes[1]);
+        return new[] { cd, ab };
     }
 
     private static string FormatValue(object raw, TagPoint tag)
     {
-        if (raw is bool b)
-            return b ? "ON" : "OFF";
-
         var scaled = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
         if (string.IsNullOrEmpty(tag.Unit))
         {

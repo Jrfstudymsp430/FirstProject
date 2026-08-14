@@ -35,7 +35,7 @@ public class ChannelStateToLabelConverter : IValueConverter
         {
             return state switch
             {
-                ChannelState.Connected => "在线",
+                ChannelState.Connected => "已连接",
                 ChannelState.Connecting => "连接中",
                 ChannelState.Error => "故障",
                 _ => "离线"
@@ -124,14 +124,9 @@ public class FunctionCodeToTextConverter : IValueConverter
         {
             return code switch
             {
-                ModbusFunctionCode.ReadCoils => "01 读线圈",
-                ModbusFunctionCode.ReadDiscreteInputs => "02 读离散",
-                ModbusFunctionCode.ReadHoldingRegisters => "03 保持寄存器",
-                ModbusFunctionCode.ReadInputRegisters => "04 输入寄存器",
-                ModbusFunctionCode.WriteSingleCoil => "05 写线圈",
-                ModbusFunctionCode.WriteSingleRegister => "06 写寄存器",
-                ModbusFunctionCode.WriteMultipleCoils => "0F 写多线圈",
-                ModbusFunctionCode.WriteMultipleRegisters => "10 写多寄存器",
+                ModbusFunctionCode.ReadHoldingRegisters => "03 读保持寄存器",
+                ModbusFunctionCode.WriteSingleRegister => "06 写单个寄存器",
+                ModbusFunctionCode.WriteMultipleRegisters => "16 写多个寄存器",
                 _ => code.ToString()
             };
         }
@@ -150,12 +145,8 @@ public class DataTypeToTextConverter : IValueConverter
         {
             return type switch
             {
-                TagDataType.Bool => "Bool",
-                TagDataType.Int16 => "Int16",
                 TagDataType.UInt16 => "UInt16",
-                TagDataType.Int32 => "Int32",
-                TagDataType.UInt32 => "UInt32",
-                TagDataType.Float32 => "Float32",
+                TagDataType.Float32 => "Float CDAB",
                 _ => type.ToString()
             };
         }

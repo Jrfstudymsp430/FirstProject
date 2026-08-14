@@ -1,3 +1,4 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ScadaApp.Models;
 using ScadaApp.Services;
@@ -27,14 +28,13 @@ public partial class TagItemViewModel : ObservableObject
     public byte SlaveId => _tag.SlaveId;
     public string FunctionCode => _tag.FunctionCode switch
     {
-        ModbusFunctionCode.ReadCoils => "01 读线圈",
-        ModbusFunctionCode.ReadDiscreteInputs => "02 读离散",
-        ModbusFunctionCode.ReadHoldingRegisters => "03 保持寄存器",
-        ModbusFunctionCode.ReadInputRegisters => "04 输入寄存器",
+        ModbusFunctionCode.ReadHoldingRegisters => "03 读保持寄存器",
+        ModbusFunctionCode.WriteSingleRegister => "06 写单个寄存器",
+        ModbusFunctionCode.WriteMultipleRegisters => "16 写多个寄存器",
         _ => _tag.FunctionCode.ToString()
     };
     public ushort Address => _tag.Address;
-    public string DataType => _tag.DataType.ToString();
+    public string DataType => _tag.DataType == TagDataType.Float32 ? "Float CDAB" : "UInt16";
     public string Unit => _tag.Unit;
     public bool IsWritable => _tag.IsWritable;
     public string ChannelName => _channel.Name;
@@ -53,12 +53,8 @@ public partial class TagItemViewModel : ObservableObject
         input = StripUnit(input.Trim());
         object parsed = _tag.DataType switch
         {
-            TagDataType.Bool => input is "1" or "ON" or "on" or "true" or "True" or "开",
-            TagDataType.Int16 => short.Parse(input),
-            TagDataType.UInt16 => ushort.Parse(input),
-            TagDataType.Int32 => int.Parse(input),
-            TagDataType.UInt32 => uint.Parse(input),
-            TagDataType.Float32 => float.Parse(input),
+            TagDataType.UInt16 => ushort.Parse(input, CultureInfo.InvariantCulture),
+            TagDataType.Float32 => float.Parse(input, CultureInfo.InvariantCulture),
             _ => input
         };
 
@@ -71,12 +67,8 @@ public partial class TagItemViewModel : ObservableObject
             return input;
 
         var space = input.LastIndexOf(' ');
-        if (space > 0)
-        {
-            var numeric = input[..space];
-            if (double.TryParse(numeric, out _))
-                return numeric;
-        }
+        if (space > 0 && double.TryParse(input[..space], out _))
+            return input[..space];
 
         return input;
     }

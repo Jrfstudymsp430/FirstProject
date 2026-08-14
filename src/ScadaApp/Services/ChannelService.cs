@@ -44,6 +44,7 @@ public sealed class ChannelService : IChannelService, IDisposable
         {
             _client = new ModbusRtuClient(_config);
             await _client.ConnectAsync(cancellationToken).ConfigureAwait(false);
+            // 连接成功后保持 Connected：轮询失败只记日志，不改回连接中/离线
             SetState(ChannelState.Connected);
             AddLog("Info", $"通道已连接: {_config.PortName} @ {_config.BaudRate}");
 

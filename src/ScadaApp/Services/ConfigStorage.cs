@@ -23,7 +23,9 @@ public static class ConfigStorage
                 return CreateDefaultChannels();
 
             var json = File.ReadAllText(ConfigPath);
-            return JsonSerializer.Deserialize<List<ChannelConfig>>(json, JsonOptions) ?? CreateDefaultChannels();
+            var loaded = JsonSerializer.Deserialize<List<ChannelConfig>>(json, JsonOptions) ?? CreateDefaultChannels();
+            Sanitize(loaded);
+            return loaded;
         }
         catch
         {
@@ -56,29 +58,31 @@ public static class ConfigStorage
                     FunctionCode = ModbusFunctionCode.ReadHoldingRegisters,
                     Address = 0,
                     DataType = TagDataType.Float32,
-                    Unit = "°C",
-                    Scale = 0.1
-                },
-                new TagPoint
-                {
-                    Name = "运行状态",
-                    SlaveId = 1,
-                    FunctionCode = ModbusFunctionCode.ReadCoils,
-                    Address = 0,
-                    DataType = TagDataType.Bool
+                    Unit = "°C"
                 },
                 new TagPoint
                 {
                     Name = "设定值",
                     SlaveId = 1,
-                    FunctionCode = ModbusFunctionCode.ReadHoldingRegisters,
-                    Address = 10,
-                    DataType = TagDataType.UInt16,
-                    IsWritable = true
+                    FunctionCode = ModbusFunctionCode.WriteMultipleRegisters,
+                    Address = 2,
+                    DataType = TagDataType.Float32,
+                    Unit = "°C"
                 }
             }
         };
 
         return new List<ChannelConfig> { channel };
+    }
+
+    private static void Sanitize(List<ChannelConfig> channels)
+    {
+        foreach (var tag in channels.SelectMany(c => c.Tags))
+        {
+            if (!Enum.IsDefined(tag.FunctionCode))
+                tag.FunctionCode = ModbusFunctionCode.ReadHoldingRegisters;
+            if (!Enum.IsDefined(tag.DataType))
+                tag.DataType = TagDataType.Float32;
+        }
     }
 }

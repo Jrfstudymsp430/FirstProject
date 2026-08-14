@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ScadaApp.Models;
@@ -14,11 +15,15 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private ChannelItemViewModel? _selectedChannel;
     [ObservableProperty] private string _statusText = "就绪";
+    [ObservableProperty] private string _connectionStatusText = "离线";
     [ObservableProperty] private bool _isGlobalRunning;
     [ObservableProperty] private int _channelCount;
     [ObservableProperty] private int _runningChannelCount;
     [ObservableProperty] private int _tagCount;
     [ObservableProperty] private int _goodTagCount;
+    [ObservableProperty] private string _currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+    private readonly DispatcherTimer _clock = new() { Interval = TimeSpan.FromSeconds(1) };
 
     public ObservableCollection<ChannelItemViewModel> Channels { get; } = new();
     public ObservableCollection<TagItemViewModel> Tags { get; } = new();
@@ -45,6 +50,9 @@ public partial class MainViewModel : ObservableObject
 
         LoadFromStorage();
         RefreshPorts();
+
+        _clock.Tick += (_, _) => CurrentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        _clock.Start();
     }
 
     partial void OnSelectedChannelChanged(ChannelItemViewModel? value)
@@ -103,7 +111,8 @@ public partial class MainViewModel : ObservableObject
 
         if (_channelManager.GetRunningChannel(SelectedChannel.Id) != null)
         {
-            StatusText = $"{SelectedChannel.Name} 已在运行";
+            SelectedChannel.RefreshState();
+            ApplyConnectedStatusText();
             return;
         }
 
@@ -113,7 +122,7 @@ public partial class MainViewModel : ObservableObject
             await _channelManager.StartChannelAsync(SelectedChannel.Id);
             SelectedChannel.RefreshState();
             RefreshSummary();
-            StatusText = $"{SelectedChannel.Name} 已启动";
+            ApplyConnectedStatusText();
         }
         catch (Exception ex)
         {
@@ -130,7 +139,9 @@ public partial class MainViewModel : ObservableObject
         await _channelManager.StopChannelAsync(SelectedChannel.Id);
         SelectedChannel.RefreshState();
         RefreshSummary();
-        StatusText = $"{SelectedChannel.Name} 已停止";
+        ApplyConnectedStatusText();
+        if (Channels.All(c => c.State != ChannelState.Connected))
+            StatusText = $"{SelectedChannel.Name} 已停止";
     }
 
     [RelayCommand]
@@ -141,7 +152,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var ch in Channels) ch.RefreshState();
         IsGlobalRunning = true;
         RefreshSummary();
-        StatusText = "所有通道已启动";
+        ApplyConnectedStatusText();
     }
 
     [RelayCommand]
@@ -151,6 +162,7 @@ public partial class MainViewModel : ObservableObject
         foreach (var ch in Channels) ch.RefreshState();
         IsGlobalRunning = false;
         RefreshSummary();
+        ApplyConnectedStatusText();
         StatusText = "所有通道已停止";
     }
 
@@ -169,7 +181,9 @@ public partial class MainViewModel : ObservableObject
         var tag = new TagPoint
         {
             Name = $"Tag{SelectedChannel.Config.Tags.Count + 1}",
-            Address = (ushort)(SelectedChannel.Config.Tags.Count * 2)
+            Address = (ushort)(SelectedChannel.Config.Tags.Count * 2),
+            FunctionCode = ModbusFunctionCode.ReadHoldingRegisters,
+            DataType = TagDataType.Float32
         };
 
         if (!TagConfigDialog.Edit(tag))
@@ -263,6 +277,7 @@ public partial class MainViewModel : ObservableObject
 
         SelectedChannel = Channels.FirstOrDefault(c => c.Id == selectedId) ?? Channels.FirstOrDefault();
         RefreshSummary();
+        ApplyConnectedStatusText();
     }
 
     private void LoadTagsForChannel(ChannelItemViewModel? channel)
@@ -296,6 +311,13 @@ public partial class MainViewModel : ObservableObject
         RefreshSummary();
     }
 
+    [RelayCommand]
+    private void ClearLogs()
+    {
+        Logs.Clear();
+        ApplyConnectedStatusText(clearedLogs: true);
+    }
+
     private void RefreshSummary()
     {
         ChannelCount = Channels.Count;
@@ -309,6 +331,33 @@ public partial class MainViewModel : ObservableObject
         foreach (var ch in Channels)
             ch.RefreshState();
         RefreshSummary();
+        ApplyConnectedStatusText();
+    }
+
+    /// <summary>
+    /// 连接成功后状态栏与日志标题保持显示「已连接」，直到用户主动停止。
+    /// </summary>
+    private void ApplyConnectedStatusText(bool clearedLogs = false)
+    {
+        var connected = Channels.Where(c => c.State == ChannelState.Connected).ToList();
+        if (connected.Count > 0)
+        {
+            ConnectionStatusText = connected.Count == 1
+                ? $"{connected[0].Name} 已连接"
+                : $"已连接 {connected.Count} 个通道";
+            StatusText = ConnectionStatusText;
+            return;
+        }
+
+        if (Channels.Any(c => c.State == ChannelState.Connecting))
+        {
+            ConnectionStatusText = "连接中";
+            return;
+        }
+
+        ConnectionStatusText = "离线";
+        if (clearedLogs)
+            StatusText = "日志已清空";
     }
 
     private void AddLog(LogEntry log)
@@ -335,6 +384,7 @@ public partial class MainViewModel : ObservableObject
 
     public async Task ShutdownAsync()
     {
+        _clock.Stop();
         await _channelManager.StopAllAsync();
         ConfigStorage.Save(_channelManager.Channels);
     }
