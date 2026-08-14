@@ -47,6 +47,8 @@ public partial class TagConfigDialog : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
+        Point.Name = Point.Name?.Trim() ?? string.Empty;
+        Point.Unit = Point.Unit?.Trim() ?? string.Empty;
         DialogResult = true;
         Close();
     }

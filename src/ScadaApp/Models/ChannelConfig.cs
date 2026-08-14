@@ -20,4 +20,18 @@ public partial class ChannelConfig : ObservableObject
     [ObservableProperty] private bool _isEnabled = true;
 
     public List<TagPoint> Tags { get; set; } = new();
+
+    partial void OnNameChanged(string value)
+    {
+        var trimmed = value?.Trim() ?? string.Empty;
+        if (value != trimmed)
+            Name = trimmed;
+    }
+
+    partial void OnPortNameChanged(string value)
+    {
+        var trimmed = value?.Trim() ?? string.Empty;
+        if (value != trimmed)
+            PortName = trimmed;
+    }
 }

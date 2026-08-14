@@ -307,13 +307,13 @@
         </Setter>
     </Style>
 
-    <!-- 输入框 -->
+    <!-- 输入框：与 ComboBox 相同的左侧内边距，避免有的看起来前面多一截空格 -->
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="{StaticResource BgCard}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Padding" Value="8,0,8,0"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="MinHeight" Value="32"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -325,8 +325,10 @@
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="6" Height="32">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
-                                      VerticalAlignment="Center"/>
+                        <ScrollViewer x:Name="PART_ContentHost"
+                                      Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Stretch"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsFocused" Value="True">
@@ -370,7 +372,7 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Padding" Value="8,0,8,0"/>
         <Setter Property="Height" Value="32"/>
         <Setter Property="MinHeight" Value="32"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
@@ -420,13 +422,15 @@
                                               Content="{TemplateBinding SelectionBoxItem}"
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                               ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                              Margin="8,0,4,0"
+                                              Margin="{TemplateBinding Padding}"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Left"/>
                             <TextBox x:Name="PART_EditableTextBox"
                                      Grid.Column="0"
-                                     Margin="8,0,4,0"
+                                     Margin="{TemplateBinding Padding}"
+                                     Padding="0"
                                      Height="30"
+                                     MinHeight="0"
                                      VerticalContentAlignment="Center"
                                      Focusable="True"
                                      Background="Transparent"
@@ -434,7 +438,16 @@
                                      CaretBrush="{StaticResource Accent}"
                                      BorderThickness="0"
                                      Visibility="Hidden"
-                                     IsReadOnly="{TemplateBinding IsReadOnly}"/>
+                                     IsReadOnly="{TemplateBinding IsReadOnly}">
+                                <TextBox.Template>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <ScrollViewer x:Name="PART_ContentHost"
+                                                      Margin="0"
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Stretch"/>
+                                    </ControlTemplate>
+                                </TextBox.Template>
+                            </TextBox>
                         </Grid>
                         <Popup x:Name="Popup"
                                Placement="Bottom"
