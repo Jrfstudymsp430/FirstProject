@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using ScadaApp.Helpers;
 using ScadaApp.ViewModels;
 
@@ -23,13 +24,23 @@ public partial class MainWindow : Window
         if (_isShuttingDown)
             return;
 
+        // 先取消本次关闭，等串口清理完成后再异步 Close。
+        // 若 ShutdownAsync 同步完成，直接 Close() 仍处于 Closing 过程中会抛 InvalidOperationException。
         e.Cancel = true;
         _isShuttingDown = true;
+        Hide();
 
-        if (DataContext is MainViewModel vm)
-            await vm.ShutdownAsync();
+        try
+        {
+            if (DataContext is MainViewModel vm)
+                await vm.ShutdownAsync();
+        }
+        catch
+        {
+            // 清理失败也继续退出
+        }
 
-        Close();
+        await Dispatcher.InvokeAsync(Close, DispatcherPriority.Background);
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
