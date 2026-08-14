@@ -1,4 +1,3 @@
-using System.IO.Ports;
 using System.Windows;
 using System.Windows.Input;
 using ScadaApp.Models;
@@ -10,13 +9,7 @@ public partial class ChannelConfigDialog : Window
     private readonly ChannelConfig _config;
     private readonly Snapshot _snapshot;
 
-    public ChannelConfigDialog(
-        ChannelConfig config,
-        IEnumerable<string> ports,
-        IEnumerable<int> baudRates,
-        IEnumerable<Parity> parities,
-        IEnumerable<StopBits> stopBits,
-        IEnumerable<int> dataBits)
+    public ChannelConfigDialog(ChannelConfig config, IEnumerable<string> ports, IEnumerable<int> baudRates)
     {
         _config = config;
         _snapshot = Snapshot.Capture(config);
@@ -24,9 +17,6 @@ public partial class ChannelConfigDialog : Window
 
         PortCombo.ItemsSource = ports;
         BaudCombo.ItemsSource = baudRates;
-        ParityCombo.ItemsSource = parities;
-        StopBitsCombo.ItemsSource = stopBits;
-        DataBitsCombo.ItemsSource = dataBits;
         DataContext = config;
     }
 
@@ -40,6 +30,12 @@ public partial class ChannelConfigDialog : Window
     {
         _config.Name = _config.Name?.Trim() ?? string.Empty;
         _config.PortName = _config.PortName?.Trim() ?? string.Empty;
+        if (_config.SlaveId is < 1 or > 247)
+            _config.SlaveId = 1;
+
+        foreach (var tag in _config.Tags)
+            tag.SlaveId = _config.SlaveId;
+
         DialogResult = true;
         Close();
     }
@@ -51,15 +47,9 @@ public partial class ChannelConfigDialog : Window
         Close();
     }
 
-    public static bool Edit(
-        ChannelConfig config,
-        IEnumerable<string> ports,
-        IEnumerable<int> baudRates,
-        IEnumerable<Parity> parities,
-        IEnumerable<StopBits> stopBits,
-        IEnumerable<int> dataBits)
+    public static bool Edit(ChannelConfig config, IEnumerable<string> ports, IEnumerable<int> baudRates)
     {
-        var dialog = new ChannelConfigDialog(config, ports, baudRates, parities, stopBits, dataBits)
+        var dialog = new ChannelConfigDialog(config, ports, baudRates)
         {
             Owner = Application.Current.MainWindow
         };
@@ -71,18 +61,14 @@ public partial class ChannelConfigDialog : Window
         string PortName,
         int BaudRate,
         int PollingIntervalMs,
-        Parity Parity,
-        StopBits StopBits,
-        int DataBits)
+        byte SlaveId)
     {
         public static Snapshot Capture(ChannelConfig config) => new(
             config.Name,
             config.PortName,
             config.BaudRate,
             config.PollingIntervalMs,
-            config.Parity,
-            config.StopBits,
-            config.DataBits);
+            config.SlaveId);
 
         public void Restore(ChannelConfig config)
         {
@@ -90,9 +76,7 @@ public partial class ChannelConfigDialog : Window
             config.PortName = PortName;
             config.BaudRate = BaudRate;
             config.PollingIntervalMs = PollingIntervalMs;
-            config.Parity = Parity;
-            config.StopBits = StopBits;
-            config.DataBits = DataBits;
+            config.SlaveId = SlaveId;
         }
     }
 }

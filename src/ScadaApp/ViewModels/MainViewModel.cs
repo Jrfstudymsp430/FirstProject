@@ -31,9 +31,6 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> AvailablePorts { get; } = new();
 
     public int[] BaudRates => SerialPortHelper.CommonBaudRates;
-    public int[] DataBitsOptions => SerialPortHelper.DataBitsOptions;
-    public Array ParityOptions => SerialPortHelper.ParityOptions;
-    public Array StopBitsOptions => SerialPortHelper.StopBitsOptions;
     public Array FunctionCodes => Enum.GetValues(typeof(ModbusFunctionCode));
     public Array DataTypes => Enum.GetValues(typeof(TagDataType));
 
@@ -183,18 +180,13 @@ public partial class MainViewModel : ObservableObject
         }
 
         RefreshPorts();
-        if (!ChannelConfigDialog.Edit(
-                SelectedChannel.Config,
-                AvailablePorts,
-                BaudRates,
-                ParityOptions.Cast<System.IO.Ports.Parity>(),
-                StopBitsOptions.Cast<System.IO.Ports.StopBits>(),
-                DataBitsOptions))
+        if (!ChannelConfigDialog.Edit(SelectedChannel.Config, AvailablePorts, BaudRates))
             return;
 
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
         SelectedChannel.RefreshState();
+        LoadTagsForChannel(SelectedChannel);
         StatusText = $"已更新通道参数: {SelectedChannel.Name}";
     }
 
@@ -207,6 +199,7 @@ public partial class MainViewModel : ObservableObject
         {
             Name = $"Tag{SelectedChannel.Config.Tags.Count + 1}",
             Address = (ushort)(SelectedChannel.Config.Tags.Count * 2),
+            SlaveId = SelectedChannel.Config.SlaveId,
             FunctionCode = ModbusFunctionCode.ReadHoldingRegisters,
             DataType = TagDataType.Float32
         };

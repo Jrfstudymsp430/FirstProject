@@ -91,6 +91,7 @@ public static class ConfigStorage
             PortName = "COM1",
             BaudRate = 9600,
             PollingIntervalMs = 1000,
+            SlaveId = 1,
             Tags =
             {
                 new TagPoint
@@ -123,10 +124,17 @@ public static class ConfigStorage
         {
             channel.Name = TrimOrEmpty(channel.Name);
             channel.PortName = TrimOrEmpty(channel.PortName);
+            if (channel.SlaveId is < 1 or > 247)
+            {
+                var fromTag = channel.Tags.FirstOrDefault()?.SlaveId ?? 1;
+                channel.SlaveId = fromTag is >= 1 and <= 247 ? fromTag : (byte)1;
+            }
+
             foreach (var tag in channel.Tags)
             {
                 tag.Name = TrimOrEmpty(tag.Name);
                 tag.Unit = TrimOrEmpty(tag.Unit);
+                tag.SlaveId = channel.SlaveId;
                 if (!Enum.IsDefined(tag.FunctionCode))
                     tag.FunctionCode = ModbusFunctionCode.ReadHoldingRegisters;
                 if (!Enum.IsDefined(tag.DataType))

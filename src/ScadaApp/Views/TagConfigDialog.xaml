@@ -47,7 +47,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" />
@@ -71,22 +70,10 @@
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{StaticResource FieldLabel}"
-                    Text="从站地址" />
-                <TextBox
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Margin="0,0,0,10"
-                    Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" />
-
-                <TextBlock
-                    Grid.Row="2"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
                     Text="功能码" />
                 <ComboBox
                     x:Name="FunctionCodeCombo"
-                    Grid.Row="2"
+                    Grid.Row="1"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     SelectedItem="{Binding FunctionCode}">
@@ -98,26 +85,26 @@
                 </ComboBox>
 
                 <TextBlock
-                    Grid.Row="3"
+                    Grid.Row="2"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{StaticResource FieldLabel}"
                     Text="寄存器地址" />
                 <TextBox
-                    Grid.Row="3"
+                    Grid.Row="2"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
-                    Grid.Row="4"
+                    Grid.Row="3"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{StaticResource FieldLabel}"
                     Text="数据类型" />
                 <ComboBox
                     x:Name="DataTypeCombo"
-                    Grid.Row="4"
+                    Grid.Row="3"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     SelectedItem="{Binding DataType}">
@@ -129,25 +116,25 @@
                 </ComboBox>
 
                 <TextBlock
-                    Grid.Row="5"
+                    Grid.Row="4"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{StaticResource FieldLabel}"
                     Text="单位" />
                 <TextBox
-                    Grid.Row="5"
+                    Grid.Row="4"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
-                    Grid.Row="6"
+                    Grid.Row="5"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     Style="{StaticResource FieldLabel}"
                     Text="比例 / 偏移" />
                 <StackPanel
-                    Grid.Row="6"
+                    Grid.Row="5"
                     Grid.Column="1"
                     Margin="0,0,0,10"
                     Orientation="Horizontal">
@@ -167,12 +154,12 @@
                 </StackPanel>
 
                 <TextBlock
-                    Grid.Row="7"
+                    Grid.Row="6"
                     Grid.Column="1"
                     Margin="0,0,0,20"
                     FontSize="11"
                     Foreground="{StaticResource TextSecondary}"
-                    Text="03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB）" />
+                    Text="从机ID在通道参数中设置；03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB）" />
             </Grid>
 
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">

@@ -17,6 +17,7 @@ public partial class ChannelConfig : ObservableObject
     [ObservableProperty] private int _readTimeout = 1000;
     [ObservableProperty] private int _writeTimeout = 1000;
     [ObservableProperty] private int _pollingIntervalMs = 500;
+    [ObservableProperty] private byte _slaveId = 1;
     [ObservableProperty] private bool _isEnabled = true;
 
     public List<TagPoint> Tags { get; set; } = new();

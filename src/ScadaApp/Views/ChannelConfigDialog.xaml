@@ -75,8 +75,6 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <TextBlock
@@ -120,49 +118,25 @@
                         Grid.Row="3"
                         VerticalAlignment="Center"
                         Style="{StaticResource FieldLabel}"
-                        Text="轮询间隔" />
+                        Text="从机ID" />
                     <TextBox
                         Grid.Row="3"
                         Grid.Column="1"
                         Margin="0,0,0,5"
                         Padding="3,0,0,0"
+                        Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" />
+
+                    <TextBlock
+                        Grid.Row="4"
+                        VerticalAlignment="Center"
+                        Style="{StaticResource FieldLabel}"
+                        Text="轮询间隔" />
+                    <TextBox
+                        Grid.Row="4"
+                        Grid.Column="1"
+                        Margin="0,0,0,16"
+                        Padding="3,0,0,0"
                         Text="{Binding PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}" />
-
-                    <TextBlock
-                        Grid.Row="4"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource FieldLabel}"
-                        Text="校验位" />
-                    <ComboBox
-                        x:Name="ParityCombo"
-                        Grid.Row="4"
-                        Grid.Column="1"
-                        Margin="0,0,0,5"
-                        SelectedItem="{Binding Parity}" />
-
-                    <TextBlock
-                        Grid.Row="5"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource FieldLabel}"
-                        Text="停止位" />
-                    <ComboBox
-                        x:Name="StopBitsCombo"
-                        Grid.Row="5"
-                        Grid.Column="1"
-                        Margin="0,0,0,5"
-                        SelectedItem="{Binding StopBits}" />
-
-                    <TextBlock
-                        Grid.Row="6"
-                        VerticalAlignment="Center"
-                        Style="{StaticResource FieldLabel}"
-                        Text="数据位" />
-                    <ComboBox
-                        x:Name="DataBitsCombo"
-                        Grid.Row="6"
-                        Grid.Column="1"
-                        Margin="0,0,0,5"
-                        SelectedItem="{Binding DataBits}" />
                 </Grid>
 
                 <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
