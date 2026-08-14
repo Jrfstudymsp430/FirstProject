@@ -1,16 +1,11 @@
 namespace ScadaApp.Models;
 
 /// <summary>
-/// Modbus 标准功能码
+/// 本软件支持的 Modbus RTU 功能码：03 读保持寄存器、06 写单个寄存器、16 写多个寄存器
 /// </summary>
 public enum ModbusFunctionCode : byte
 {
-    ReadCoils = 0x01,
-    ReadDiscreteInputs = 0x02,
     ReadHoldingRegisters = 0x03,
-    ReadInputRegisters = 0x04,
-    WriteSingleCoil = 0x05,
     WriteSingleRegister = 0x06,
-    WriteMultipleCoils = 0x0F,
     WriteMultipleRegisters = 0x10
 }

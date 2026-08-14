@@ -35,7 +35,7 @@
             </Grid.RowDefinitions>
 
             <!-- 深色标题栏 -->
-            <Grid Grid.Row="0" Background="#111827" ClipToBounds="True">
+            <Grid Grid.Row="0" Background="{StaticResource BgPanel}" ClipToBounds="True">
                 <Border Background="Transparent"
                         MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"/>
                 <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" IsHitTestVisible="False"/>
@@ -52,6 +52,10 @@
                     <TextBlock Text="SCADA · Modbus RTU 多通道采集系统"
                                Foreground="{StaticResource TextSecondary}" FontSize="12"/>
                 </StackPanel>
+                <TextBlock Text="{Binding CurrentTime}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Foreground="{StaticResource TextPrimary}" FontSize="12"
+                           FontFamily="Consolas" IsHitTestVisible="False"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                             Panel.ZIndex="1">
                     <Button x:Name="MinimizeButton" Style="{StaticResource WindowChromeButton}"
@@ -400,10 +404,19 @@
             <!-- 通信日志 -->
             <Border Grid.Row="3" Style="{StaticResource PanelCard}" Margin="0,12,0,12" Padding="14,12">
                 <DockPanel>
-                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
-                        <Border Width="3" Height="14" CornerRadius="2" Background="{StaticResource AccentBarBrush}" Margin="0,0,10,0"/>
-                        <TextBlock Text="通信日志" Style="{StaticResource SectionTitle}"/>
-                    </StackPanel>
+                    <Grid DockPanel.Dock="Top" Margin="0,0,0,8">
+                        <StackPanel Orientation="Horizontal">
+                            <Border Width="3" Height="14" CornerRadius="2" Background="{StaticResource AccentBarBrush}" Margin="0,0,10,0"/>
+                            <TextBlock Text="通信日志" Style="{StaticResource SectionTitle}"/>
+                            <Border Margin="12,0,0,0" CornerRadius="4" Padding="8,2" VerticalAlignment="Center"
+                                    Background="{Binding SelectedChannel.State, Converter={StaticResource ChannelStateToBadgeBrush}}">
+                                <TextBlock Text="{Binding ConnectionStatusText}" FontSize="11"
+                                           Foreground="{Binding SelectedChannel.State, Converter={StaticResource ChannelStateToBrush}}"/>
+                            </Border>
+                        </StackPanel>
+                        <Button Content="清空日志" HorizontalAlignment="Right" Padding="10,4"
+                                Style="{StaticResource SecondaryButton}" Command="{Binding ClearLogsCommand}"/>
+                    </Grid>
                     <ListBox ItemsSource="{Binding Logs}"
                              Style="{StaticResource LogListBox}"
                              ItemContainerStyle="{StaticResource LogListItem}">
@@ -439,9 +452,12 @@
                         <Ellipse Width="8" Height="8" Fill="{StaticResource Accent}" Margin="0,0,8,0"/>
                         <TextBlock Text="{Binding StatusText}" Foreground="{StaticResource TextSecondary}"/>
                     </StackPanel>
-                    <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center"
-                               Foreground="{StaticResource TextSecondary}" FontSize="11"
-                               Text="Modbus RTU · SCADA v1.0"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding ConnectionStatusText}" Foreground="{StaticResource Accent}"
+                                   FontSize="11" Margin="0,0,14,0"/>
+                        <TextBlock Text="{Binding CurrentTime, StringFormat=Modbus RTU · {0}}"
+                                   Foreground="{StaticResource TextSecondary}" FontSize="11"/>
+                    </StackPanel>
                 </Grid>
             </Border>
         </Grid>

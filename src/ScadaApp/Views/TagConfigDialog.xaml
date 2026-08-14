@@ -58,7 +58,13 @@
 
                 <TextBlock Grid.Row="4" Grid.Column="0" Text="数据类型" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
                 <ComboBox x:Name="DataTypeCombo" Grid.Row="4" Grid.Column="1"
-                          SelectedItem="{Binding DataType}" Margin="0,0,0,10"/>
+                          SelectedItem="{Binding DataType}" Margin="0,0,0,10">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource DataTypeToText}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <TextBlock Grid.Row="5" Grid.Column="0" Text="单位" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
                 <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
@@ -70,7 +76,9 @@
                     <TextBox Width="90" Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" ToolTip="Offset"/>
                 </StackPanel>
 
-                <CheckBox Grid.Row="7" Grid.Column="1" Content="允许写入" IsChecked="{Binding IsWritable}" Margin="0,0,0,20"/>
+                <TextBlock Grid.Row="7" Grid.Column="1" Margin="0,0,0,20" FontSize="11"
+                           Foreground="{StaticResource TextSecondary}"
+                           Text="03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB）"/>
             </Grid>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
