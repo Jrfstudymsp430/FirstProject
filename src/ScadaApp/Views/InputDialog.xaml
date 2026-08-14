@@ -5,8 +5,10 @@
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         MinWidth="400"
-        Background="{StaticResource BgDark}">
-    <Border Style="{StaticResource PanelCard}" Margin="16" Padding="24">
+        WindowStyle="None"
+        Background="{StaticResource BgDark}"
+        ShowInTaskbar="False">
+    <Border Style="{StaticResource DialogRootBorder}">
         <StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                 <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource AccentGradientBrush}" Margin="0,0,12,0">
