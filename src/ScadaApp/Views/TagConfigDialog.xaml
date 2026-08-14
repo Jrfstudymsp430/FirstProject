@@ -5,58 +5,72 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        MinWidth="420">
-    <Border Padding="20" Background="#FF1E272E">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="名称" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="从站地址" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="功能码" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <ComboBox x:Name="FunctionCodeCombo" Grid.Row="2" Grid.Column="1"
-                      SelectedItem="{Binding FunctionCode}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="寄存器地址" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="数据类型" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <ComboBox x:Name="DataTypeCombo" Grid.Row="4" Grid.Column="1"
-                      SelectedItem="{Binding DataType}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="5" Grid.Column="0" Text="单位" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
-
-            <TextBlock Grid.Row="6" Grid.Column="0" Text="比例/偏移" VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-            <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,8">
-                <TextBox Width="80" Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}" ToolTip="Scale"/>
-                <TextBlock Text=" / " VerticalAlignment="Center" Foreground="#FF90A4AE"/>
-                <TextBox Width="80" Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" ToolTip="Offset"/>
+        MinWidth="460"
+        Background="{StaticResource BgDark}">
+    <Border Style="{StaticResource PanelCard}" Margin="16" Padding="24">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource AccentGradientBrush}" Margin="0,0,12,0">
+                    <TextBlock Text="⚙" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="标签配置" FontSize="16" FontWeight="Bold"/>
+                    <TextBlock Text="Modbus 数据点参数" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                </StackPanel>
             </StackPanel>
 
-            <CheckBox Grid.Row="7" Grid.Column="1" Content="可写入" IsChecked="{Binding IsWritable}" Margin="0,0,0,16"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="确定" Width="80" Margin="0,0,8,0" Click="OkButton_Click" IsDefault="True"/>
-                <Button Content="取消" Width="80" Click="CancelButton_Click" IsCancel="True"/>
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="名称" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="从站地址" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="功能码" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <ComboBox x:Name="FunctionCodeCombo" Grid.Row="2" Grid.Column="1"
+                          SelectedItem="{Binding FunctionCode}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="寄存器地址" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="4" Grid.Column="0" Text="数据类型" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <ComboBox x:Name="DataTypeCombo" Grid.Row="4" Grid.Column="1"
+                          SelectedItem="{Binding DataType}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="5" Grid.Column="0" Text="单位" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
+
+                <TextBlock Grid.Row="6" Grid.Column="0" Text="比例 / 偏移" Style="{StaticResource FieldLabel}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Row="6" Grid.Column="1" Orientation="Horizontal" Margin="0,0,0,10">
+                    <TextBox Width="90" Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}" ToolTip="Scale"/>
+                    <TextBlock Text=" / " VerticalAlignment="Center" Foreground="{StaticResource TextSecondary}" Margin="4,0"/>
+                    <TextBox Width="90" Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}" ToolTip="Offset"/>
+                </StackPanel>
+
+                <CheckBox Grid.Row="7" Grid.Column="1" Content="允许写入" IsChecked="{Binding IsWritable}" Margin="0,0,0,20"/>
+            </Grid>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="取消" Width="90" Style="{StaticResource SecondaryButton}" Margin="0,0,10,0"
+                        Click="CancelButton_Click" IsCancel="True"/>
+                <Button Content="确定" Width="90" Style="{StaticResource SuccessButton}"
+                        Click="OkButton_Click" IsDefault="True"/>
             </StackPanel>
-        </Grid>
+        </StackPanel>
     </Border>
 </Window>

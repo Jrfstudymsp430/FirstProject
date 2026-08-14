@@ -3,103 +3,381 @@
                     xmlns:conv="clr-namespace:ScadaApp.Converters">
 
     <conv:ChannelStateToBrushConverter x:Key="ChannelStateToBrush"/>
+    <conv:ChannelStateToLabelConverter x:Key="ChannelStateToLabel"/>
     <conv:QualityToBrushConverter x:Key="QualityToBrush"/>
+    <conv:LogLevelToBrushConverter x:Key="LogLevelToBrush"/>
     <conv:InverseBoolConverter x:Key="InverseBool"/>
     <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
 
-    <SolidColorBrush x:Key="BgDark" Color="#FF0F1419"/>
-    <SolidColorBrush x:Key="BgPanel" Color="#FF1A2332"/>
-    <SolidColorBrush x:Key="BgCard" Color="#FF243447"/>
-    <SolidColorBrush x:Key="Accent" Color="#FF3498DB"/>
-    <SolidColorBrush x:Key="TextPrimary" Color="#FFECEFF1"/>
-    <SolidColorBrush x:Key="TextSecondary" Color="#FF90A4AE"/>
-    <SolidColorBrush x:Key="BorderColor" Color="#FF37474F"/>
+    <!-- 配色：工业 SCADA 深色 + 青绿强调 -->
+    <Color x:Key="ColorBgDeep">#0A0E17</Color>
+    <Color x:Key="ColorBgPanel">#111827</Color>
+    <Color x:Key="ColorBgCard">#1A2332</Color>
+    <Color x:Key="ColorBgElevated">#243044</Color>
+    <Color x:Key="ColorAccent">#00D4AA</Color>
+    <Color x:Key="ColorAccentDim">#009E82</Color>
+    <Color x:Key="ColorAccentBlue">#00B4D8</Color>
+    <Color x:Key="ColorDanger">#FF5252</Color>
+    <Color x:Key="ColorWarning">#FFC107</Color>
+    <Color x:Key="ColorTextPrimary">#F1F5F9</Color>
+    <Color x:Key="ColorTextSecondary">#94A3B8</Color>
+    <Color x:Key="ColorBorder">#2D3A4F</Color>
+    <Color x:Key="ColorBorderLight">#3D4F6A</Color>
 
+    <SolidColorBrush x:Key="BgDark" Color="{StaticResource ColorBgDeep}"/>
+    <SolidColorBrush x:Key="BgPanel" Color="{StaticResource ColorBgPanel}"/>
+    <SolidColorBrush x:Key="BgCard" Color="{StaticResource ColorBgCard}"/>
+    <SolidColorBrush x:Key="BgElevated" Color="{StaticResource ColorBgElevated}"/>
+    <SolidColorBrush x:Key="Accent" Color="{StaticResource ColorAccent}"/>
+    <SolidColorBrush x:Key="AccentBlue" Color="{StaticResource ColorAccentBlue}"/>
+    <SolidColorBrush x:Key="TextPrimary" Color="{StaticResource ColorTextPrimary}"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="{StaticResource ColorTextSecondary}"/>
+    <SolidColorBrush x:Key="BorderColor" Color="{StaticResource ColorBorder}"/>
+    <SolidColorBrush x:Key="BorderLight" Color="{StaticResource ColorBorderLight}"/>
+
+    <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0A0E17" Offset="0"/>
+        <GradientStop Color="#0F1724" Offset="0.5"/>
+        <GradientStop Color="#0A1628" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HeaderGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#141C2B" Offset="0"/>
+        <GradientStop Color="#1A2332" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#00D4AA" Offset="0"/>
+        <GradientStop Color="#00B4D8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="AccentBarBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00D4AA" Offset="0"/>
+        <GradientStop Color="#00B4D8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 窗口 -->
     <Style TargetType="Window">
-        <Setter Property="Background" Value="{StaticResource BgDark}"/>
+        <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-        <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI"/>
+        <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI, PingFang SC"/>
         <Setter Property="FontSize" Value="13"/>
     </Style>
 
+    <!-- 面板卡片 -->
+    <Style x:Key="PanelCard" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BgPanel}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#000000" BlurRadius="16" ShadowDepth="2" Opacity="0.35"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="SectionTitle" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="Margin" Value="0,0,0,6"/>
+    </Style>
+
+    <!-- 统计卡片 -->
+    <Style x:Key="StatCard" TargetType="Border">
+        <Setter Property="Background" Value="{StaticResource BgCard}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="8"/>
+        <Setter Property="Padding" Value="14,10"/>
+        <Setter Property="MinWidth" Value="100"/>
+    </Style>
+
+    <!-- 按钮 -->
     <Style TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource Accent}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{StaticResource AccentGradientBrush}"/>
+        <Setter Property="Foreground" Value="#0A0E17"/>
         <Setter Property="BorderThickness" Value="0"/>
-        <Setter Property="Padding" Value="14,8"/>
+        <Setter Property="Padding" Value="16,9"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            BorderBrush="{StaticResource BorderLight}" BorderThickness="0">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.88"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.75"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <Style x:Key="SecondaryButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource BgElevated}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="Padding" Value="16,9"/>
+        <Setter Property="FontWeight" Value="Normal"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource BgCard}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource BorderLight}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="Foreground" Value="#FF8A80"/>
+        <Setter Property="BorderBrush" Value="#66FF5252"/>
         <Style.Triggers>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Opacity" Value="0.5"/>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#33FF5252"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="SecondaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="Background" Value="{StaticResource BgCard}"/>
+    <Style x:Key="IconButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+        <Setter Property="Width" Value="34"/>
+        <Setter Property="Height" Value="34"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="FontWeight" Value="Bold"/>
     </Style>
 
-    <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-        <Setter Property="Background" Value="#FFE74C3C"/>
+    <Style x:Key="SuccessButton" TargetType="Button">
+        <Setter Property="Background" Value="{StaticResource AccentGradientBrush}"/>
+        <Setter Property="Foreground" Value="#0A0E17"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="16,9"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.88"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Opacity" Value="0.4"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
+    <!-- 输入框 -->
     <Style TargetType="TextBox">
         <Setter Property="Background" Value="{StaticResource BgCard}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="6">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style TargetType="ComboBox">
         <Setter Property="Background" Value="{StaticResource BgCard}"/>
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="Padding" Value="8,6"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="10,8"/>
     </Style>
 
-    <Style TargetType="DataGrid">
-        <Setter Property="Background" Value="{StaticResource BgPanel}"/>
+    <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <!-- 通道列表 -->
+    <Style x:Key="ChannelListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <Style x:Key="ChannelListItem" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="Card" Background="{StaticResource BgCard}"
+                            BorderBrush="{StaticResource BorderColor}" BorderThickness="1"
+                            CornerRadius="8" Padding="12,10" Cursor="Hand">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="AccentBar" Grid.Column="0" CornerRadius="2"
+                                    Background="Transparent" Margin="0,2,10,2"/>
+                            <ContentPresenter Grid.Column="1"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Card" Property="Background" Value="{StaticResource BgElevated}"/>
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource BorderLight}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Card" Property="Background" Value="#1E2D3D"/>
+                            <Setter TargetName="Card" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                            <Setter TargetName="AccentBar" Property="Background" Value="{StaticResource AccentBarBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 数据表格 -->
+    <Style TargetType="DataGrid">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="GridLinesVisibility" Value="Horizontal"/>
         <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="RowBackground" Value="{StaticResource BgPanel}"/>
-        <Setter Property="AlternatingRowBackground" Value="{StaticResource BgCard}"/>
+        <Setter Property="VerticalGridLinesBrush" Value="Transparent"/>
+        <Setter Property="RowBackground" Value="Transparent"/>
+        <Setter Property="AlternatingRowBackground" Value="#0DFFFFFF"/>
         <Setter Property="HeadersVisibility" Value="Column"/>
         <Setter Property="AutoGenerateColumns" Value="False"/>
         <Setter Property="CanUserAddRows" Value="False"/>
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="IsReadOnly" Value="True"/>
+        <Setter Property="RowHeight" Value="42"/>
+        <Setter Property="CanUserResizeRows" Value="False"/>
     </Style>
 
     <Style TargetType="DataGridColumnHeader">
         <Setter Property="Background" Value="{StaticResource BgCard}"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="12,10"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
     </Style>
 
-    <Style TargetType="ListBox">
-        <Setter Property="Background" Value="{StaticResource BgPanel}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    <Style TargetType="DataGridCell">
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="12,0"/>
+        <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+        <Style.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#2200D4AA"/>
+                <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
-    <Style TargetType="GroupBox">
-        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
-        <Setter Property="Padding" Value="8"/>
+    <Style TargetType="DataGridRow">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="#11FFFFFF"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="#2200D4AA"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- 日志列表 -->
+    <Style x:Key="LogListBox" TargetType="ListBox">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="FontFamily" Value="Cascadia Code, Consolas, monospace"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <Style x:Key="LogListItem" TargetType="ListBoxItem">
+        <Setter Property="Padding" Value="4,3"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- 滚动条 -->
+    <Style TargetType="ScrollBar">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Width" Value="8"/>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Height" Value="8"/>
+                <Setter Property="Width" Value="Auto"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

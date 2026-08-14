@@ -4,14 +4,22 @@
         SizeToContent="WidthAndHeight"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        MinWidth="360">
-    <Border Padding="20" Background="#FF1E272E">
+        MinWidth="400"
+        Background="{StaticResource BgDark}">
+    <Border Style="{StaticResource PanelCard}" Margin="16" Padding="24">
         <StackPanel>
-            <TextBlock x:Name="PromptText" Foreground="White" Margin="0,0,0,12" TextWrapping="Wrap"/>
-            <TextBox x:Name="InputTextBox" MinWidth="300" Padding="8,6" Margin="0,0,0,16"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+                <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource AccentGradientBrush}" Margin="0,0,12,0">
+                    <TextBlock Text="✎" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock x:Name="PromptText" TextWrapping="Wrap" VerticalAlignment="Center" FontSize="14"/>
+            </StackPanel>
+            <TextBox x:Name="InputTextBox" MinWidth="320" Margin="0,0,0,20"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="确定" Width="80" Margin="0,0,8,0" Click="OkButton_Click" IsDefault="True"/>
-                <Button Content="取消" Width="80" Click="CancelButton_Click" IsCancel="True"/>
+                <Button Content="取消" Width="90" Style="{StaticResource SecondaryButton}" Margin="0,0,10,0"
+                        Click="CancelButton_Click" IsCancel="True"/>
+                <Button Content="确定" Width="90" Style="{StaticResource SuccessButton}"
+                        Click="OkButton_Click" IsDefault="True"/>
             </StackPanel>
         </StackPanel>
     </Border>
