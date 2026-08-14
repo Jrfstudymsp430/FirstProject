@@ -9,6 +9,7 @@ public interface IChannelManager
     event EventHandler? ChannelsChanged;
     event EventHandler<LogEntry>? LogAdded;
     event EventHandler<TagValue>? TagValueUpdated;
+    event EventHandler? ChannelStateChanged;
 
     void AddChannel(ChannelConfig config);
     void RemoveChannel(string channelId);

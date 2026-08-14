@@ -15,6 +15,7 @@ public sealed class ChannelManager : IChannelManager
     public event EventHandler? ChannelsChanged;
     public event EventHandler<LogEntry>? LogAdded;
     public event EventHandler<TagValue>? TagValueUpdated;
+    public event EventHandler? ChannelStateChanged;
 
     public void AddChannel(ChannelConfig config)
     {
@@ -56,9 +57,18 @@ public sealed class ChannelManager : IChannelManager
         var service = new ChannelService(config);
         service.LogAdded += (_, log) => LogAdded?.Invoke(this, log);
         service.TagValueUpdated += (_, value) => TagValueUpdated?.Invoke(this, value);
+        service.StateChanged += (_, _) => ChannelStateChanged?.Invoke(this, EventArgs.Empty);
 
-        await service.StartAsync(cancellationToken).ConfigureAwait(false);
         _running[channelId] = service;
+        try
+        {
+            await service.StartAsync(cancellationToken).ConfigureAwait(false);
+        }
+        catch
+        {
+            _running.Remove(channelId);
+            throw;
+        }
     }
 
     public async Task StopChannelAsync(string channelId)

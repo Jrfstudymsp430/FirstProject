@@ -41,6 +41,7 @@ public partial class MainViewModel : ObservableObject
 
         _channelManager.LogAdded += (_, log) => RunOnUi(() => AddLog(log));
         _channelManager.TagValueUpdated += (_, value) => RunOnUi(() => UpdateTagValue(value));
+        _channelManager.ChannelStateChanged += (_, _) => RunOnUi(RefreshAllChannelStates);
 
         LoadFromStorage();
         RefreshPorts();
@@ -301,6 +302,13 @@ public partial class MainViewModel : ObservableObject
         RunningChannelCount = Channels.Count(c => c.IsRunning);
         TagCount = Tags.Count;
         GoodTagCount = Tags.Count(t => t.Quality == "Good");
+    }
+
+    private void RefreshAllChannelStates()
+    {
+        foreach (var ch in Channels)
+            ch.RefreshState();
+        RefreshSummary();
     }
 
     private void AddLog(LogEntry log)

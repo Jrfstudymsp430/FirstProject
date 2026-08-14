@@ -104,8 +104,8 @@ public partial class MainWindow : Window
     private void UpdateMaximizeButtonIcon()
     {
         MaximizeIcon.Data = _isMaximized
-            ? System.Windows.Media.Geometry.Parse("M2,2 H10 V10 H2 Z M0,0 H8 V1 H0 Z")
-            : System.Windows.Media.Geometry.Parse("M0,0 H9 V9 H0 Z");
+            ? System.Windows.Media.Geometry.Parse("M3,1 H10 V8 M1,3 H8 V10 H1 Z")
+            : System.Windows.Media.Geometry.Parse("M1,1 H9 V9 H1 Z");
         MaximizeButton.ToolTip = _isMaximized ? "还原" : "最大化";
     }
 }

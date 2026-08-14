@@ -75,8 +75,12 @@
         <Setter Property="Width" Value="10"/>
         <Setter Property="Height" Value="10"/>
         <Setter Property="Stretch" Value="Uniform"/>
+        <Setter Property="Fill" Value="Transparent"/>
         <Setter Property="Stroke" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"/>
-        <Setter Property="StrokeThickness" Value="1"/>
+        <Setter Property="StrokeThickness" Value="1.2"/>
+        <Setter Property="StrokeStartLineCap" Value="Square"/>
+        <Setter Property="StrokeEndLineCap" Value="Square"/>
+        <Setter Property="StrokeLineJoin" Value="Miter"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 
@@ -182,7 +186,7 @@
     <Style x:Key="FieldLabel" TargetType="TextBlock">
         <Setter Property="FontSize" Value="11"/>
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        <Setter Property="Margin" Value="0,0,0,6"/>
+        <Setter Property="Margin" Value="0,0,0,3"/>
     </Style>
 
     <!-- 统计卡片 -->
@@ -309,7 +313,10 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="CaretBrush" Value="{StaticResource Accent}"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -317,8 +324,9 @@
                     <Border x:Name="Bd" Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="6">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"/>
+                            CornerRadius="6" Height="32">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}"
+                                      VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsFocused" Value="True">
@@ -362,7 +370,10 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="Padding" Value="8,0"/>
+        <Setter Property="Height" Value="32"/>
+        <Setter Property="MinHeight" Value="32"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource DarkComboBoxItem}"/>
@@ -374,8 +385,9 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6"/>
-                        <Grid Margin="1">
+                                CornerRadius="6"
+                                Height="32"/>
+                        <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="28"/>
@@ -408,12 +420,14 @@
                                               Content="{TemplateBinding SelectionBoxItem}"
                                               ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
                                               ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
-                                              Margin="10,8,4,8"
+                                              Margin="8,0,4,0"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Left"/>
                             <TextBox x:Name="PART_EditableTextBox"
                                      Grid.Column="0"
-                                     Margin="10,6,4,6"
+                                     Margin="8,0,4,0"
+                                     Height="30"
+                                     VerticalContentAlignment="Center"
                                      Focusable="True"
                                      Background="Transparent"
                                      Foreground="{StaticResource TextPrimary}"
