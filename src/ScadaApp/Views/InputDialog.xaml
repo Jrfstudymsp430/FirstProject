@@ -8,7 +8,7 @@
         WindowStyle="None"
         Background="{StaticResource BgDark}"
         ShowInTaskbar="False">
-    <Border Style="{StaticResource DialogRootBorder}">
+    <Border Style="{StaticResource DialogRootBorder}" MouseLeftButtonDown="Header_MouseLeftButtonDown">
         <StackPanel>
             <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
                 <Border Width="36" Height="36" CornerRadius="8" Background="{StaticResource AccentGradientBrush}" Margin="0,0,12,0">

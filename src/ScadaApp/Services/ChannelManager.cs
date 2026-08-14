@@ -24,11 +24,15 @@ public sealed class ChannelManager : IChannelManager
 
     public void RemoveChannel(string channelId)
     {
+        _channels.RemoveAll(c => c.Id == channelId);
+    }
+
+    public async Task RemoveChannelAsync(string channelId)
+    {
         if (_running.ContainsKey(channelId))
-            StopChannelAsync(channelId).GetAwaiter().GetResult();
+            await StopChannelAsync(channelId).ConfigureAwait(false);
 
         _channels.RemoveAll(c => c.Id == channelId);
-        ChannelsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void UpdateChannel(ChannelConfig config)
@@ -36,7 +40,6 @@ public sealed class ChannelManager : IChannelManager
         var index = _channels.FindIndex(c => c.Id == config.Id);
         if (index >= 0)
             _channels[index] = config;
-        ChannelsChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public async Task StartChannelAsync(string channelId, CancellationToken cancellationToken = default)

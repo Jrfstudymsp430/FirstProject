@@ -1,20 +1,23 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
 namespace ScadaApp.Models;
 
 /// <summary>
 /// 串口通道配置（一个通道对应一个 COM 口）
 /// </summary>
-public class ChannelConfig
+public partial class ChannelConfig : ObservableObject
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
-    public string Name { get; set; } = "通道1";
-    public string PortName { get; set; } = "COM1";
-    public int BaudRate { get; set; } = 9600;
-    public int DataBits { get; set; } = 8;
-    public System.IO.Ports.Parity Parity { get; set; } = System.IO.Ports.Parity.None;
-    public System.IO.Ports.StopBits StopBits { get; set; } = System.IO.Ports.StopBits.One;
-    public int ReadTimeout { get; set; } = 1000;
-    public int WriteTimeout { get; set; } = 1000;
-    public int PollingIntervalMs { get; set; } = 500;
-    public bool IsEnabled { get; set; } = true;
+    [ObservableProperty] private string _id = Guid.NewGuid().ToString();
+    [ObservableProperty] private string _name = "通道1";
+    [ObservableProperty] private string _portName = "COM1";
+    [ObservableProperty] private int _baudRate = 9600;
+    [ObservableProperty] private int _dataBits = 8;
+    [ObservableProperty] private System.IO.Ports.Parity _parity = System.IO.Ports.Parity.None;
+    [ObservableProperty] private System.IO.Ports.StopBits _stopBits = System.IO.Ports.StopBits.One;
+    [ObservableProperty] private int _readTimeout = 1000;
+    [ObservableProperty] private int _writeTimeout = 1000;
+    [ObservableProperty] private int _pollingIntervalMs = 500;
+    [ObservableProperty] private bool _isEnabled = true;
+
     public List<TagPoint> Tags { get; set; } = new();
 }

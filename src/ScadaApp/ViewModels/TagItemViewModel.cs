@@ -25,7 +25,14 @@ public partial class TagItemViewModel : ObservableObject
     public string TagId => _tag.Id;
     public string Name => _tag.Name;
     public byte SlaveId => _tag.SlaveId;
-    public string FunctionCode => _tag.FunctionCode.ToString();
+    public string FunctionCode => _tag.FunctionCode switch
+    {
+        ModbusFunctionCode.ReadCoils => "01 读线圈",
+        ModbusFunctionCode.ReadDiscreteInputs => "02 读离散",
+        ModbusFunctionCode.ReadHoldingRegisters => "03 保持寄存器",
+        ModbusFunctionCode.ReadInputRegisters => "04 输入寄存器",
+        _ => _tag.FunctionCode.ToString()
+    };
     public ushort Address => _tag.Address;
     public string DataType => _tag.DataType.ToString();
     public string Unit => _tag.Unit;
@@ -43,9 +50,10 @@ public partial class TagItemViewModel : ObservableObject
 
     public async Task WriteAsync(string input)
     {
+        input = StripUnit(input.Trim());
         object parsed = _tag.DataType switch
         {
-            TagDataType.Bool => input is "1" or "ON" or "on" or "true" or "True",
+            TagDataType.Bool => input is "1" or "ON" or "on" or "true" or "True" or "开",
             TagDataType.Int16 => short.Parse(input),
             TagDataType.UInt16 => ushort.Parse(input),
             TagDataType.Int32 => int.Parse(input),
@@ -55,5 +63,21 @@ public partial class TagItemViewModel : ObservableObject
         };
 
         await _channelManager.WriteTagAsync(_channel.Id, TagId, parsed);
+    }
+
+    private static string StripUnit(string input)
+    {
+        if (double.TryParse(input, out _))
+            return input;
+
+        var space = input.LastIndexOf(' ');
+        if (space > 0)
+        {
+            var numeric = input[..space];
+            if (double.TryParse(numeric, out _))
+                return numeric;
+        }
+
+        return input;
     }
 }

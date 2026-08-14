@@ -115,3 +115,87 @@ public class BoolToHiddenVisibilityConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
         value is Visibility v && v == Visibility.Visible;
 }
+
+public class FunctionCodeToTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is ModbusFunctionCode code)
+        {
+            return code switch
+            {
+                ModbusFunctionCode.ReadCoils => "01 读线圈",
+                ModbusFunctionCode.ReadDiscreteInputs => "02 读离散",
+                ModbusFunctionCode.ReadHoldingRegisters => "03 保持寄存器",
+                ModbusFunctionCode.ReadInputRegisters => "04 输入寄存器",
+                ModbusFunctionCode.WriteSingleCoil => "05 写线圈",
+                ModbusFunctionCode.WriteSingleRegister => "06 写寄存器",
+                ModbusFunctionCode.WriteMultipleCoils => "0F 写多线圈",
+                ModbusFunctionCode.WriteMultipleRegisters => "10 写多寄存器",
+                _ => code.ToString()
+            };
+        }
+        return value?.ToString() ?? string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+public class DataTypeToTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is TagDataType type)
+        {
+            return type switch
+            {
+                TagDataType.Bool => "Bool",
+                TagDataType.Int16 => "Int16",
+                TagDataType.UInt16 => "UInt16",
+                TagDataType.Int32 => "Int32",
+                TagDataType.UInt32 => "UInt32",
+                TagDataType.Float32 => "Float32",
+                _ => type.ToString()
+            };
+        }
+        return value?.ToString() ?? string.Empty;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+public class TimestampToTextConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is DateTime dt && dt != default && dt != DateTime.MinValue)
+            return dt.ToString("HH:mm:ss.fff");
+        return "--";
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+public class ChannelStateToBadgeBrushConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is ChannelState state)
+        {
+            return state switch
+            {
+                ChannelState.Connected => new SolidColorBrush(Color.FromArgb(0x33, 0x00, 0xD4, 0xAA)),
+                ChannelState.Connecting => new SolidColorBrush(Color.FromArgb(0x33, 0xFF, 0xC1, 0x07)),
+                ChannelState.Error => new SolidColorBrush(Color.FromArgb(0x33, 0xFF, 0x52, 0x52)),
+                _ => new SolidColorBrush(Color.FromArgb(0x33, 0x64, 0x74, 0x8B))
+            };
+        }
+        return new SolidColorBrush(Colors.Transparent);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}

@@ -15,6 +15,7 @@ public partial class ChannelItemViewModel : ObservableObject
     {
         _channelManager = channelManager;
         Config = config;
+        Config.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Summary));
     }
 
     public ChannelConfig Config { get; }
@@ -24,7 +25,7 @@ public partial class ChannelItemViewModel : ObservableObject
     public string PortName => Config.PortName;
     public int BaudRate => Config.BaudRate;
     public int TagCount => Config.Tags.Count;
-    public string Summary => $"{PortName} @ {BaudRate} | {TagCount} 点";
+    public string Summary => $"{Config.PortName} @ {Config.BaudRate} | {Config.Tags.Count} 点";
 
     public void RefreshState()
     {
@@ -39,5 +40,6 @@ public partial class ChannelItemViewModel : ObservableObject
             State = ChannelState.Disconnected;
             IsRunning = false;
         }
+        OnPropertyChanged(nameof(Summary));
     }
 }

@@ -12,6 +12,7 @@ public interface IChannelManager
 
     void AddChannel(ChannelConfig config);
     void RemoveChannel(string channelId);
+    Task RemoveChannelAsync(string channelId);
     void UpdateChannel(ChannelConfig config);
     Task StartChannelAsync(string channelId, CancellationToken cancellationToken = default);
     Task StopChannelAsync(string channelId);

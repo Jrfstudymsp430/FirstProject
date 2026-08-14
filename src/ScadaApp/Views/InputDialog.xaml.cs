@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 
 namespace ScadaApp.Views;
 
@@ -14,6 +15,12 @@ public partial class InputDialog : Window
         InputTextBox.Text = defaultValue;
         InputTextBox.SelectAll();
         InputTextBox.Focus();
+    }
+
+    private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton == MouseButton.Left)
+            DragMove();
     }
 
     private void OkButton_Click(object sender, RoutedEventArgs e)

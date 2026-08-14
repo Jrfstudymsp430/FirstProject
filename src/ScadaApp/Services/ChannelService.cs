@@ -12,7 +12,7 @@ public sealed class ChannelService : IChannelService, IDisposable
     private ModbusRtuClient? _client;
     private CancellationTokenSource? _pollCts;
     private Task? _pollTask;
-    private readonly ConcurrentDictionary<string, TagValue> _tagValues = new();
+    private readonly ConcurrentDictionary<string, string> _lastErrors = new();
     private ChannelState _state = ChannelState.Disconnected;
 
     public ChannelService(ChannelConfig config)
@@ -120,7 +120,18 @@ public sealed class ChannelService : IChannelService, IDisposable
                     TagValueUpdated?.Invoke(this, value);
 
                     if (value.Quality == "Bad" && value.ErrorMessage != null)
-                        AddLog("Warn", $"{tag.Name}: {value.ErrorMessage}");
+                    {
+                        var previous = _lastErrors.GetValueOrDefault(tag.Id);
+                        if (previous != value.ErrorMessage)
+                        {
+                            _lastErrors[tag.Id] = value.ErrorMessage;
+                            AddLog("Warn", $"{tag.Name}: {value.ErrorMessage}");
+                        }
+                    }
+                    else
+                    {
+                        _lastErrors.TryRemove(tag.Id, out _);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -128,9 +139,10 @@ public sealed class ChannelService : IChannelService, IDisposable
                 }
             }
 
+            var interval = Math.Max(100, _config.PollingIntervalMs);
             try
             {
-                await Task.Delay(_config.PollingIntervalMs, cancellationToken).ConfigureAwait(false);
+                await Task.Delay(interval, cancellationToken).ConfigureAwait(false);
             }
             catch (OperationCanceledException)
             {
@@ -158,6 +170,16 @@ public sealed class ChannelService : IChannelService, IDisposable
 
     public void Dispose()
     {
-        StopAsync().GetAwaiter().GetResult();
+        try
+        {
+            _pollCts?.Cancel();
+        }
+        catch
+        {
+            // ignored
+        }
+
+        _client?.Dispose();
+        _pollCts?.Dispose();
     }
 }

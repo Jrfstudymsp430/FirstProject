@@ -9,10 +9,11 @@
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         Background="{StaticResource BgDark}"
-        ResizeMode="CanResize">
+        ResizeMode="CanResize"
+        Closing="Window_Closing">
 
     <WindowChrome.WindowChrome>
-        <WindowChrome CaptionHeight="32"
+        <WindowChrome CaptionHeight="0"
                       ResizeBorderThickness="6"
                       GlassFrameThickness="0"
                       CornerRadius="0"
@@ -34,10 +35,11 @@
 
             <!-- 深色标题栏 -->
             <Grid Grid.Row="0" Background="#111827" ClipToBounds="True">
-                <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1"/>
+                <Border Background="Transparent"
+                        MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"/>
+                <Border BorderBrush="{StaticResource BorderColor}" BorderThickness="0,0,0,1" IsHitTestVisible="False"/>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="12,0,140,0"
-                            Background="Transparent"
-                            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                            IsHitTestVisible="False">
                     <Border Width="14" Height="14" CornerRadius="3" Margin="0,0,8,0">
                         <Border.Background>
                             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
@@ -85,78 +87,65 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- 顶部标题栏 -->
-            <Border Grid.Row="0" CornerRadius="12" Padding="20,16" Margin="0,0,0,12"
+            <!-- 顶部工具栏 -->
+            <Border Grid.Row="0" CornerRadius="12" Padding="16,12" Margin="0,0,0,12"
                     Background="{StaticResource HeaderGradientBrush}"
                     BorderBrush="{StaticResource BorderColor}" BorderThickness="1">
-                <Border.Effect>
-                    <DropShadowEffect Color="#000" BlurRadius="20" ShadowDepth="3" Opacity="0.4"/>
-                </Border.Effect>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- Logo -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Border Width="44" Height="44" CornerRadius="10" Margin="0,0,14,0">
+                <DockPanel LastChildFill="True">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <Border Width="36" Height="36" CornerRadius="8" Margin="0,0,10,0">
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                     <GradientStop Color="#00D4AA" Offset="0"/>
                                     <GradientStop Color="#00B4D8" Offset="1"/>
                                 </LinearGradientBrush>
                             </Border.Background>
-                            <TextBlock Text="⚡" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="SCADA 采集系统" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                            <TextBlock Text="Modbus RTU · 多通道并行通信" FontSize="12"
-                                       Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
+                            <TextBlock Text="SCADA 采集系统" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                            <TextBlock Text="Modbus RTU" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                         </StackPanel>
                     </StackPanel>
 
-                    <!-- 统计卡片 -->
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
-                            <StackPanel>
-                                <TextBlock Text="通道" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock Text="{Binding ChannelCount}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource Accent}"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
-                            <StackPanel>
-                                <TextBlock Text="在线" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock Text="{Binding RunningChannelCount}" FontSize="22" FontWeight="Bold" Foreground="#00D4AA"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource StatCard}" Margin="0,0,10,0">
-                            <StackPanel>
-                                <TextBlock Text="数据点" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock Text="{Binding TagCount}" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource StatCard}">
-                            <StackPanel>
-                                <TextBlock Text="正常" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock Text="{Binding GoodTagCount}" FontSize="22" FontWeight="Bold" Foreground="#00D4AA"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
+                    <WrapPanel DockPanel.Dock="Right" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="刷新串口" Command="{Binding RefreshPortsCommand}"
+                                Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" Padding="12,6"/>
+                        <Button Content="保存" Command="{Binding SaveConfigCommand}"
+                                Style="{StaticResource SecondaryButton}" Margin="0,0,6,0" Padding="12,6"/>
+                        <Button Content="启动全部" Command="{Binding StartAllCommand}"
+                                Style="{StaticResource SuccessButton}" Margin="0,0,6,0" Padding="12,6"/>
+                        <Button Content="停止全部" Command="{Binding StopAllCommand}"
+                                Style="{StaticResource DangerButton}" Padding="12,6"/>
+                    </WrapPanel>
 
-                    <!-- 工具按钮 -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Content="⟳ 刷新串口" Command="{Binding RefreshPortsCommand}"
-                                Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
-                        <Button Content="💾 保存" Command="{Binding SaveConfigCommand}"
-                                Style="{StaticResource SecondaryButton}" Margin="0,0,8,0"/>
-                        <Button Content="▶ 启动全部" Command="{Binding StartAllCommand}"
-                                Style="{StaticResource SuccessButton}" Margin="0,0,8,0"/>
-                        <Button Content="■ 停止全部" Command="{Binding StopAllCommand}"
-                                Style="{StaticResource DangerButton}"/>
-                    </StackPanel>
-                </Grid>
+                    <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,8,0" Padding="10,6" MinWidth="72">
+                            <StackPanel>
+                                <TextBlock Text="通道" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding ChannelCount}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource Accent}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,8,0" Padding="10,6" MinWidth="72">
+                            <StackPanel>
+                                <TextBlock Text="在线" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding RunningChannelCount}" FontSize="18" FontWeight="Bold" Foreground="#00D4AA"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}" Margin="0,0,8,0" Padding="10,6" MinWidth="72">
+                            <StackPanel>
+                                <TextBlock Text="数据点" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding TagCount}" FontSize="18" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource StatCard}" Padding="10,6" MinWidth="72">
+                            <StackPanel>
+                                <TextBlock Text="正常" FontSize="10" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock Text="{Binding GoodTagCount}" FontSize="18" FontWeight="Bold" Foreground="#00D4AA"/>
+                            </StackPanel>
+                        </Border>
+                    </WrapPanel>
+                </DockPanel>
             </Border>
 
             <!-- 分隔线 -->
@@ -205,16 +194,17 @@
                                                         <DropShadowEffect Color="#00D4AA" BlurRadius="6" ShadowDepth="0" Opacity="0.8"/>
                                                     </Ellipse.Effect>
                                                 </Ellipse>
-                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="13"/>
+                                                <TextBlock Text="{Binding Config.Name}" FontWeight="SemiBold" FontSize="13"/>
                                             </StackPanel>
                                             <Border HorizontalAlignment="Right" VerticalAlignment="Center"
-                                                    Background="#2200D4AA" CornerRadius="4" Padding="6,2">
+                                                    Background="{Binding State, Converter={StaticResource ChannelStateToBadgeBrush}}"
+                                                    CornerRadius="4" Padding="6,2">
                                                 <TextBlock Text="{Binding State, Converter={StaticResource ChannelStateToLabel}}"
-                                                           FontSize="10" Foreground="{StaticResource Accent}"/>
+                                                           FontSize="10"
+                                                           Foreground="{Binding State, Converter={StaticResource ChannelStateToBrush}}"/>
                                             </Border>
                                         </Grid>
                                         <StackPanel Orientation="Horizontal" Margin="16,6,0,0">
-                                            <TextBlock Text="🔌" FontSize="11" Margin="0,0,4,0"/>
                                             <TextBlock Text="{Binding Summary}" Foreground="{StaticResource TextSecondary}" FontSize="11"/>
                                         </StackPanel>
                                     </StackPanel>
@@ -240,6 +230,10 @@
                                 <TextBlock Text="通道参数" Style="{StaticResource SectionTitle}"/>
                             </StackPanel>
                             <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="12"/>
@@ -249,23 +243,38 @@
                                     <ColumnDefinition Width="12"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
+                                <StackPanel Grid.Row="0" Grid.Column="0" Margin="0,0,0,10">
                                     <TextBlock Text="通道名称" Style="{StaticResource FieldLabel}"/>
                                     <TextBox Text="{Binding Config.Name, UpdateSourceTrigger=PropertyChanged}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="2">
+                                <StackPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,10">
                                     <TextBlock Text="串口" Style="{StaticResource FieldLabel}"/>
                                     <ComboBox ItemsSource="{Binding DataContext.AvailablePorts, RelativeSource={RelativeSource AncestorType=Window}}"
                                               Text="{Binding Config.PortName, UpdateSourceTrigger=PropertyChanged}" IsEditable="True"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="4">
+                                <StackPanel Grid.Row="0" Grid.Column="4" Margin="0,0,0,10">
                                     <TextBlock Text="波特率" Style="{StaticResource FieldLabel}"/>
                                     <ComboBox ItemsSource="{Binding DataContext.BaudRates, RelativeSource={RelativeSource AncestorType=Window}}"
                                               SelectedItem="{Binding Config.BaudRate}"/>
                                 </StackPanel>
-                                <StackPanel Grid.Column="6">
+                                <StackPanel Grid.Row="0" Grid.Column="6" Margin="0,0,0,10">
                                     <TextBlock Text="轮询间隔 (ms)" Style="{StaticResource FieldLabel}"/>
                                     <TextBox Text="{Binding Config.PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="0">
+                                    <TextBlock Text="校验位" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.ParityOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedItem="{Binding Config.Parity}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="2">
+                                    <TextBlock Text="停止位" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.StopBitsOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedItem="{Binding Config.StopBits}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Grid.Column="4">
+                                    <TextBlock Text="数据位" Style="{StaticResource FieldLabel}"/>
+                                    <ComboBox ItemsSource="{Binding DataContext.DataBitsOptions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                              SelectedItem="{Binding Config.DataBits}"/>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>
@@ -304,7 +313,7 @@
                                             <Style TargetType="TextBlock" BasedOn="{StaticResource DataGridCellCenter}"/>
                                         </DataGridTextColumn.ElementStyle>
                                     </DataGridTextColumn>
-                                    <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="160">
+                                    <DataGridTextColumn Header="功能码" Binding="{Binding FunctionCode}" Width="130">
                                         <DataGridTextColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderLeft}"/>
                                         </DataGridTextColumn.HeaderStyle>
@@ -358,7 +367,7 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, StringFormat=HH:mm:ss.fff}" Width="115">
+                                    <DataGridTextColumn Header="更新时间" Binding="{Binding Timestamp, Converter={StaticResource TimestampToText}}" Width="115">
                                         <DataGridTextColumn.HeaderStyle>
                                             <Style TargetType="DataGridColumnHeader" BasedOn="{StaticResource DataGridHeaderCenter}"/>
                                         </DataGridTextColumn.HeaderStyle>

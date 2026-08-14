@@ -43,7 +43,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
             await Task.Run(() => _serialPort.Open(), cancellationToken).ConfigureAwait(false);
 
             var factory = new ModbusFactory();
-            _master = factory.CreateRtuMaster(_serialPort);
+            _master = factory.CreateRtuMaster(new SerialPortAdapter(_serialPort));
             _master.Transport.Retries = 3;
             _master.Transport.WaitToRetryMilliseconds = 250;
         }
@@ -177,7 +177,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
             TagDataType.Bool => registers[0] != 0,
             TagDataType.Int16 => (short)registers[0],
             TagDataType.UInt16 => registers[0],
-            TagDataType.Int32 => (registers[0] << 16) | registers[1],
+            TagDataType.Int32 => unchecked((int)(((uint)registers[0] << 16) | registers[1])),
             TagDataType.UInt32 => ((uint)registers[0] << 16) | registers[1],
             TagDataType.Float32 => BitConverter.ToSingle(BitConverter.GetBytes(((uint)registers[0] << 16) | registers[1]), 0),
             _ => registers[0]
@@ -206,15 +206,15 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         if (raw is bool b)
             return b ? "ON" : "OFF";
 
-        if (raw is IFormattable formattable)
+        var scaled = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
+        if (string.IsNullOrEmpty(tag.Unit))
         {
-            var scaled = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
-            return string.IsNullOrEmpty(tag.Unit)
-                ? formattable.ToString("G", null) ?? scaled.ToString("F2")
-                : $"{scaled:F2} {tag.Unit}";
+            if (Math.Abs(tag.Scale - 1.0) < 1e-9 && Math.Abs(tag.Offset) < 1e-9)
+                return raw is IFormattable f ? f.ToString("G", null) ?? scaled.ToString("G") : scaled.ToString("G");
+            return scaled.ToString("G");
         }
 
-        return raw?.ToString() ?? "--";
+        return $"{scaled:F2} {tag.Unit}";
     }
 
     public void Dispose()

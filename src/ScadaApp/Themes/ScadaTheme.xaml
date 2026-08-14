@@ -10,6 +10,10 @@
     <conv:InverseBoolConverter x:Key="InverseBool"/>
     <conv:BoolToVisibilityConverter x:Key="BoolToVis"/>
     <conv:BoolToHiddenVisibilityConverter x:Key="BoolToHiddenVis"/>
+    <conv:FunctionCodeToTextConverter x:Key="FunctionCodeToText"/>
+    <conv:DataTypeToTextConverter x:Key="DataTypeToText"/>
+    <conv:TimestampToTextConverter x:Key="TimestampToText"/>
+    <conv:ChannelStateToBadgeBrushConverter x:Key="ChannelStateToBadgeBrush"/>
 
     <!-- 配色：工业 SCADA 深色 + 青绿强调 -->
     <Color x:Key="ColorBgDeep">#0A0E17</Color>
@@ -377,7 +381,8 @@
                                 <ColumnDefinition Width="28"/>
                             </Grid.ColumnDefinitions>
                             <ToggleButton x:Name="ToggleButton"
-                                          Grid.ColumnSpan="2"
+                                          Grid.Column="1"
+                                          Grid.ColumnSpan="1"
                                           Focusable="False"
                                           IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                           ClickMode="Press">
@@ -443,10 +448,16 @@
                         </Popup>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditable" Value="False">
+                            <Setter TargetName="ToggleButton" Property="Grid.Column" Value="0"/>
+                            <Setter TargetName="ToggleButton" Property="Grid.ColumnSpan" Value="2"/>
+                        </Trigger>
                         <Trigger Property="IsEditable" Value="True">
                             <Setter Property="IsTabStop" Value="False"/>
                             <Setter TargetName="PART_EditableTextBox" Property="Visibility" Value="Visible"/>
                             <Setter TargetName="ContentSite" Property="Visibility" Value="Hidden"/>
+                            <Setter TargetName="ToggleButton" Property="Grid.Column" Value="1"/>
+                            <Setter TargetName="ToggleButton" Property="Grid.ColumnSpan" Value="1"/>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="MainBorder" Property="BorderBrush" Value="{StaticResource BorderLight}"/>
@@ -466,6 +477,30 @@
     <Style TargetType="CheckBox">
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal">
+                        <Border x:Name="Box" Width="16" Height="16" CornerRadius="3" Margin="0,0,8,0"
+                                Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderColor}" BorderThickness="1"
+                                VerticalAlignment="Center">
+                            <Path x:Name="Check" Data="M2,8 L6,12 L14,3" Stroke="{StaticResource Accent}"
+                                  StrokeThickness="2" Visibility="Collapsed" Stretch="Uniform" Margin="2"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource BorderLight}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- 通道列表 -->
@@ -606,6 +641,13 @@
         <Setter Property="RowHeight" Value="44"/>
         <Setter Property="CanUserResizeRows" Value="False"/>
         <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+        <Setter Property="RowHeaderWidth" Value="0"/>
+        <Setter Property="ColumnHeaderStyle" Value="{StaticResource DataGridHeaderBase}"/>
+    </Style>
+
+    <Style TargetType="DataGridColumnHeadersPresenter">
+        <Setter Property="Background" Value="{StaticResource BgCard}"/>
+        <Setter Property="Height" Value="Auto"/>
     </Style>
 
     <Style TargetType="DataGridCell">
@@ -655,13 +697,51 @@
     </Style>
 
     <!-- 滚动条 -->
+    <Style x:Key="DarkScrollBarThumb" TargetType="Thumb">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Thumb">
+                    <Border Background="{StaticResource BorderLight}" CornerRadius="4" Margin="1"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="ScrollBar">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Width" Value="8"/>
+        <Setter Property="Width" Value="10"/>
+        <Setter Property="MinWidth" Value="10"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ScrollBar">
+                    <Grid Background="Transparent">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource DarkScrollBarThumb}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Horizontal">
-                <Setter Property="Height" Value="8"/>
+                <Setter Property="Height" Value="10"/>
                 <Setter Property="Width" Value="Auto"/>
+                <Setter Property="MinHeight" Value="10"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ScrollBar">
+                            <Grid Background="Transparent">
+                                <Track x:Name="PART_Track">
+                                    <Track.Thumb>
+                                        <Thumb Style="{StaticResource DarkScrollBarThumb}"/>
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
             </Trigger>
         </Style.Triggers>
     </Style>

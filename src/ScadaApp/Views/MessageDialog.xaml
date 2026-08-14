@@ -1,0 +1,24 @@
+<Window x:Class="ScadaApp.Views.MessageDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        SizeToContent="WidthAndHeight"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        MinWidth="360"
+        WindowStyle="None"
+        Background="{StaticResource BgDark}"
+        ShowInTaskbar="False">
+    <Border Style="{StaticResource DialogRootBorder}" MouseLeftButtonDown="Header_MouseLeftButtonDown">
+        <StackPanel>
+            <TextBlock x:Name="TitleText" FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
+            <TextBlock x:Name="MessageText" TextWrapping="Wrap" MaxWidth="420"
+                       Foreground="{StaticResource TextSecondary}" Margin="0,0,0,20"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton" Content="取消" Width="90" Style="{StaticResource SecondaryButton}"
+                        Margin="0,0,10,0" Click="CancelButton_Click" IsCancel="True"/>
+                <Button x:Name="OkButton" Content="确定" Width="90" Style="{StaticResource SuccessButton}"
+                        Click="OkButton_Click" IsDefault="True"/>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

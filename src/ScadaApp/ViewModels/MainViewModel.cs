@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ScadaApp.Models;
@@ -27,6 +26,7 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<string> AvailablePorts { get; } = new();
 
     public int[] BaudRates => SerialPortHelper.CommonBaudRates;
+    public int[] DataBitsOptions => SerialPortHelper.DataBitsOptions;
     public Array ParityOptions => SerialPortHelper.ParityOptions;
     public Array StopBitsOptions => SerialPortHelper.StopBitsOptions;
     public Array FunctionCodes => Enum.GetValues(typeof(ModbusFunctionCode));
@@ -39,7 +39,6 @@ public partial class MainViewModel : ObservableObject
         _channelManager = channelManager;
         _uiContext = SynchronizationContext.Current;
 
-        _channelManager.ChannelsChanged += (_, _) => RunOnUi(LoadChannels);
         _channelManager.LogAdded += (_, log) => RunOnUi(() => AddLog(log));
         _channelManager.TagValueUpdated += (_, value) => RunOnUi(() => UpdateTagValue(value));
 
@@ -81,14 +80,18 @@ public partial class MainViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void RemoveChannel()
+    private async Task RemoveChannelAsync()
     {
         if (SelectedChannel == null) return;
 
+        if (!MessageDialog.Confirm("删除通道", $"确定删除通道「{SelectedChannel.Name}」？运行中的连接将停止。"))
+            return;
+
         var name = SelectedChannel.Name;
-        _channelManager.RemoveChannel(SelectedChannel.Id);
+        await _channelManager.RemoveChannelAsync(SelectedChannel.Id);
         ConfigStorage.Save(_channelManager.Channels);
         LoadChannels();
+        SelectedChannel = Channels.FirstOrDefault();
         StatusText = $"已删除通道: {name}";
     }
 
@@ -96,6 +99,12 @@ public partial class MainViewModel : ObservableObject
     private async Task StartChannelAsync()
     {
         if (SelectedChannel == null) return;
+
+        if (_channelManager.GetRunningChannel(SelectedChannel.Id) != null)
+        {
+            StatusText = $"{SelectedChannel.Name} 已在运行";
+            return;
+        }
 
         try
         {
@@ -108,7 +117,7 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             StatusText = $"启动失败: {ex.Message}";
-            MessageBox.Show(ex.Message, "启动通道失败", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageDialog.Alert("启动通道失败", ex.Message);
         }
     }
 
@@ -194,10 +203,14 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedChannel == null || tag == null) return;
 
+        if (!MessageDialog.Confirm("删除标签", $"确定删除标签「{tag.Name}」？"))
+            return;
+
         SelectedChannel.Config.Tags.RemoveAll(t => t.Id == tag.TagId);
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
         LoadTagsForChannel(SelectedChannel);
+        StatusText = $"已删除标签: {tag.Name}";
     }
 
     [RelayCommand]
@@ -205,7 +218,7 @@ public partial class MainViewModel : ObservableObject
     {
         if (tag == null || !tag.IsWritable) return;
 
-        var defaultValue = tag.DisplayValue is "ERR" or "--" ? "0" : tag.DisplayValue;
+        var defaultValue = tag.DisplayValue is "ERR" or "--" ? "0" : StripDisplayUnit(tag.DisplayValue);
         var input = InputDialog.Show(
             "写入 Modbus 点",
             $"写入 {tag.Name} ({tag.DataType})",
@@ -220,7 +233,7 @@ public partial class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "写入失败", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageDialog.Alert("写入失败", ex.Message);
         }
     }
 
@@ -238,6 +251,7 @@ public partial class MainViewModel : ObservableObject
 
     private void LoadChannels()
     {
+        var selectedId = SelectedChannel?.Id;
         Channels.Clear();
         foreach (var config in _channelManager.Channels)
         {
@@ -245,6 +259,8 @@ public partial class MainViewModel : ObservableObject
             vm.RefreshState();
             Channels.Add(vm);
         }
+
+        SelectedChannel = Channels.FirstOrDefault(c => c.Id == selectedId) ?? Channels.FirstOrDefault();
         RefreshSummary();
     }
 
@@ -307,5 +323,19 @@ public partial class MainViewModel : ObservableObject
             _uiContext.Post(_ => action(), null);
         else
             action();
+    }
+
+    public async Task ShutdownAsync()
+    {
+        await _channelManager.StopAllAsync();
+        ConfigStorage.Save(_channelManager.Channels);
+    }
+
+    private static string StripDisplayUnit(string display)
+    {
+        var space = display.LastIndexOf(' ');
+        if (space > 0 && double.TryParse(display[..space], out _))
+            return display[..space];
+        return display;
     }
 }

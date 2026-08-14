@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using ScadaApp.Helpers;
+using ScadaApp.ViewModels;
 
 namespace ScadaApp.Views;
 
@@ -8,12 +9,27 @@ public partial class MainWindow : Window
 {
     private Rect _restoreBounds;
     private bool _isMaximized;
+    private bool _isShuttingDown;
 
     public MainWindow()
     {
         InitializeComponent();
         WindowWorkAreaHelper.Attach(this);
         _restoreBounds = new Rect(Left, Top, Width, Height);
+    }
+
+    private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    {
+        if (_isShuttingDown)
+            return;
+
+        e.Cancel = true;
+        _isShuttingDown = true;
+
+        if (DataContext is MainViewModel vm)
+            await vm.ShutdownAsync();
+
+        Close();
     }
 
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
