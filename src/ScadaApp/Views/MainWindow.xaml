@@ -52,10 +52,6 @@
                     <TextBlock Text="SCADA · Modbus RTU 多通道采集系统"
                                Foreground="{StaticResource TextSecondary}" FontSize="12"/>
                 </StackPanel>
-                <TextBlock Text="{Binding CurrentTime}"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           Foreground="{StaticResource TextPrimary}" FontSize="12"
-                           FontFamily="Consolas" IsHitTestVisible="False"/>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top"
                             Panel.ZIndex="1">
                     <Button x:Name="MinimizeButton" Style="{StaticResource WindowChromeButton}"
@@ -179,9 +175,9 @@
                         </Grid>
 
                         <StackPanel DockPanel.Dock="Bottom" Margin="0,14,0,0">
-                            <Button Content="▶  启动通道" Command="{Binding StartChannelCommand}"
+                            <Button Content="启动通道" Command="{Binding StartChannelCommand}"
                                     Style="{StaticResource SuccessButton}" Margin="0,0,0,8"/>
-                            <Button Content="■  停止通道" Command="{Binding StopChannelCommand}"
+                            <Button Content="停止通道" Command="{Binding StopChannelCommand}"
                                     Style="{StaticResource SecondaryButton}"/>
                         </StackPanel>
 
