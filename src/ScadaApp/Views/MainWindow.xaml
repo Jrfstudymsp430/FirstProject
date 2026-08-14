@@ -10,6 +10,7 @@
     Height="700"
     MinWidth="900"
     MinHeight="560"
+    Icon="pack://application:,,,/Assets/app.ico"
     Background="{StaticResource BgDark}"
     Closing="Window_Closing"
     ResizeMode="CanResize"
@@ -289,9 +290,9 @@
                     <!--  主内容区  -->
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="300" />
+                            <ColumnDefinition Width="3*" MinWidth="240" />
                             <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="8*" MinWidth="520" />
                         </Grid.ColumnDefinitions>
 
                         <!--  左侧：通道列表  -->
@@ -463,11 +464,16 @@
                                             Style="{StaticResource SecondaryButton}" />
                                     </Grid>
 
-                                    <DataGrid ItemsSource="{Binding Tags}" RowHeaderWidth="0">
+                                    <DataGrid
+                                        ColumnWidth="*"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalScrollBarVisibility="Disabled"
+                                        ItemsSource="{Binding Tags}"
+                                        RowHeaderWidth="0">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
-                                                Width="*"
-                                                MinWidth="50"
+                                                Width="1.2*"
+                                                MinWidth="70"
                                                 Binding="{Binding Name}"
                                                 Header="名称">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -478,7 +484,8 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTextColumn
-                                                Width="60"
+                                                Width="0.7*"
+                                                MinWidth="48"
                                                 Binding="{Binding SlaveId}"
                                                 Header="从站">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -489,7 +496,8 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTextColumn
-                                                Width="100"
+                                                Width="1.6*"
+                                                MinWidth="110"
                                                 Binding="{Binding FunctionCode}"
                                                 Header="功能码">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -500,7 +508,8 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTextColumn
-                                                Width="60"
+                                                Width="0.7*"
+                                                MinWidth="48"
                                                 Binding="{Binding Address}"
                                                 Header="地址">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -511,7 +520,8 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTextColumn
-                                                Width="90"
+                                                Width="1.1*"
+                                                MinWidth="80"
                                                 Binding="{Binding DataType}"
                                                 Header="类型">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -521,7 +531,10 @@
                                                     <Style BasedOn="{StaticResource DataGridCellCenter}" TargetType="TextBlock" />
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
-                                            <DataGridTemplateColumn Width="100" Header="当前值">
+                                            <DataGridTemplateColumn
+                                                Width="1.2*"
+                                                MinWidth="80"
+                                                Header="当前值">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
                                                 </DataGridTemplateColumn.HeaderStyle>
@@ -530,12 +543,11 @@
                                                         <Border
                                                             MinWidth="56"
                                                             Padding="8,4"
-                                                            HorizontalAlignment="Center"
+                                                            HorizontalAlignment="Stretch"
                                                             VerticalAlignment="Center"
                                                             Background="#1500D4AA"
                                                             CornerRadius="4">
                                                             <TextBlock
-                                                                Width="80"
                                                                 HorizontalAlignment="Center"
                                                                 FontSize="13"
                                                                 FontWeight="Bold"
@@ -546,7 +558,10 @@
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
-                                            <DataGridTemplateColumn Width="60" Header="质量">
+                                            <DataGridTemplateColumn
+                                                Width="0.8*"
+                                                MinWidth="56"
+                                                Header="质量">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
                                                 </DataGridTemplateColumn.HeaderStyle>
@@ -572,7 +587,8 @@
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
                                             <DataGridTextColumn
-                                                Width="80"
+                                                Width="1.1*"
+                                                MinWidth="72"
                                                 Binding="{Binding Timestamp, Converter={StaticResource TimestampToText}}"
                                                 Header="更新时间">
                                                 <DataGridTextColumn.HeaderStyle>
@@ -582,20 +598,20 @@
                                                     <Style BasedOn="{StaticResource DataGridCellCenter}" TargetType="TextBlock" />
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
-                                            <DataGridTemplateColumn Width="160" Header="操作">
+                                            <DataGridTemplateColumn
+                                                Width="1.8*"
+                                                MinWidth="150"
+                                                Header="操作">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
                                                 </DataGridTemplateColumn.HeaderStyle>
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
-                                                        <Grid
-                                                            Width="150"
-                                                            HorizontalAlignment="Center"
-                                                            VerticalAlignment="Center">
+                                                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                                             <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="50" />
-                                                                <ColumnDefinition Width="50" />
-                                                                <ColumnDefinition Width="50" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="*" />
+                                                                <ColumnDefinition Width="*" />
                                                             </Grid.ColumnDefinitions>
                                                             <Button
                                                                 Grid.Column="0"
