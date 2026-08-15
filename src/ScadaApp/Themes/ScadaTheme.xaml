@@ -480,6 +480,7 @@
                                 Focusable="True"
                                 Foreground="{StaticResource TextPrimary}"
                                 IsReadOnly="{TemplateBinding IsReadOnly}"
+                                Text="{Binding Text, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged}"
                                 Visibility="Hidden">
                                 <TextBox.Template>
                                     <ControlTemplate TargetType="TextBox">

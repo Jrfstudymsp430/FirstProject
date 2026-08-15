@@ -20,6 +20,8 @@ public partial class ChannelItemViewModel : ObservableObject
             if (e.PropertyName is nameof(ChannelConfig.Name) or nameof(ChannelConfig.PortName) or nameof(ChannelConfig.BaudRate))
             {
                 OnPropertyChanged(nameof(Name));
+                OnPropertyChanged(nameof(PortName));
+                OnPropertyChanged(nameof(BaudRate));
                 OnPropertyChanged(nameof(Summary));
             }
         };

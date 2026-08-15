@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ScadaApp.Models;
 
@@ -15,7 +16,16 @@ public partial class ChannelConfigDialog : Window
         _snapshot = Snapshot.Capture(config);
         InitializeComponent();
 
-        PortCombo.ItemsSource = ports;
+        var portList = ports
+            .Where(p => !string.IsNullOrWhiteSpace(p))
+            .Select(p => p.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (!string.IsNullOrWhiteSpace(config.PortName) &&
+            !portList.Exists(p => string.Equals(p, config.PortName, StringComparison.OrdinalIgnoreCase)))
+            portList.Insert(0, config.PortName.Trim());
+
+        PortCombo.ItemsSource = portList;
         BaudCombo.ItemsSource = baudRates;
         DataContext = config;
     }
@@ -28,8 +38,16 @@ public partial class ChannelConfigDialog : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
+        PortCombo.GetBindingExpression(ComboBox.TextProperty)?.UpdateSource();
+        PortCombo.GetBindingExpression(ComboBox.SelectedItemProperty)?.UpdateSource();
+        BaudCombo.GetBindingExpression(ComboBox.SelectedItemProperty)?.UpdateSource();
+
+        var port = (PortCombo.SelectedItem as string)?.Trim();
+        if (string.IsNullOrWhiteSpace(port))
+            port = PortCombo.Text?.Trim();
+
         _config.Name = _config.Name?.Trim() ?? string.Empty;
-        _config.PortName = _config.PortName?.Trim() ?? string.Empty;
+        _config.PortName = port ?? string.Empty;
         if (_config.SlaveId is < 1 or > 247)
             _config.SlaveId = 1;
 

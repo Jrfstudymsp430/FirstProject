@@ -101,6 +101,8 @@
                     Grid.ColumnSpan="2"
                     VerticalAlignment="Center"
                     IsEditable="True"
+                    IsTextSearchEnabled="False"
+                    SelectedItem="{Binding PortName, UpdateSourceTrigger=PropertyChanged}"
                     Text="{Binding PortName, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
