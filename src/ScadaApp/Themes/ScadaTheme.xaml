@@ -16,20 +16,20 @@
     <conv:TimestampToTextConverter x:Key="TimestampToText" />
     <conv:ChannelStateToBadgeBrushConverter x:Key="ChannelStateToBadgeBrush" />
 
-    <!--  配色：工业深色，比上一版略深  -->
-    <Color x:Key="ColorBgDeep">#1A2434</Color>
-    <Color x:Key="ColorBgPanel">#222F44</Color>
-    <Color x:Key="ColorBgCard">#2A3A52</Color>
-    <Color x:Key="ColorBgElevated">#354864</Color>
+    <!--  配色：再加深一档的工业深色  -->
+    <Color x:Key="ColorBgDeep">#131B26</Color>
+    <Color x:Key="ColorBgPanel">#182232</Color>
+    <Color x:Key="ColorBgCard">#1E2B3E</Color>
+    <Color x:Key="ColorBgElevated">#27364C</Color>
     <Color x:Key="ColorAccent">#2EE6C0</Color>
     <Color x:Key="ColorAccentDim">#1AB89A</Color>
     <Color x:Key="ColorAccentBlue">#4EC9F5</Color>
     <Color x:Key="ColorDanger">#FF6B6B</Color>
     <Color x:Key="ColorWarning">#FFD54F</Color>
-    <Color x:Key="ColorTextPrimary">#F8FAFC</Color>
-    <Color x:Key="ColorTextSecondary">#B7C4D4</Color>
-    <Color x:Key="ColorBorder">#4A5D78</Color>
-    <Color x:Key="ColorBorderLight">#5C718C</Color>
+    <Color x:Key="ColorTextPrimary">#F1F5F9</Color>
+    <Color x:Key="ColorTextSecondary">#A8B6C6</Color>
+    <Color x:Key="ColorBorder">#35485E</Color>
+    <Color x:Key="ColorBorderLight">#465A72</Color>
 
     <SolidColorBrush x:Key="BgDark" Color="{StaticResource ColorBgDeep}" />
     <SolidColorBrush x:Key="BgPanel" Color="{StaticResource ColorBgPanel}" />
@@ -43,14 +43,14 @@
     <SolidColorBrush x:Key="BorderLight" Color="{StaticResource ColorBorderLight}" />
 
     <LinearGradientBrush x:Key="WindowBackgroundBrush" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Offset="0" Color="#1A2434" />
-        <GradientStop Offset="0.5" Color="#1F2C42" />
-        <GradientStop Offset="1" Color="#1C283C" />
+        <GradientStop Offset="0" Color="#131B26" />
+        <GradientStop Offset="0.5" Color="#172030" />
+        <GradientStop Offset="1" Color="#151D2A" />
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="HeaderGradientBrush" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Offset="0" Color="#26354C" />
-        <GradientStop Offset="1" Color="#2E4058" />
+        <GradientStop Offset="0" Color="#1C283A" />
+        <GradientStop Offset="1" Color="#243348" />
     </LinearGradientBrush>
 
     <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,0">
@@ -192,6 +192,14 @@
         <Setter Property="FontSize" Value="11" />
         <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
         <Setter Property="Margin" Value="0,0,0,3" />
+    </Style>
+
+    <Style x:Key="DialogFieldLabel" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Margin" Value="0,0,14,0" />
     </Style>
 
     <!--  统计卡片  -->
