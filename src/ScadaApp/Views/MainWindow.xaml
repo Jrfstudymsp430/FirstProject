@@ -2,6 +2,7 @@
     x:Class="ScadaApp.Views.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ctrl="clr-namespace:ScadaApp.Controls"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     xmlns:vm="clr-namespace:ScadaApp.ViewModels"
     Title="SCADA · Modbus RTU 多通道采集系统"
@@ -443,19 +444,32 @@
                                                             <DockPanel>
                                                                 <Grid Margin="0,0,0,8" DockPanel.Dock="Top">
                                                                     <TextBlock
+                                                                        Margin="0,0,100,0"
                                                                         FontSize="13"
                                                                         FontWeight="SemiBold"
                                                                         Foreground="{StaticResource TextPrimary}"
-                                                                        Text="{Binding Name}" />
-                                                                    <Button
-                                                                        Padding="8,2"
+                                                                        Text="{Binding Name}"
+                                                                        TextTrimming="CharacterEllipsis" />
+                                                                    <StackPanel
                                                                         HorizontalAlignment="Right"
-                                                                        Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                        CommandParameter="{Binding}"
-                                                                        Content="写入"
-                                                                        FontSize="11"
-                                                                        Style="{StaticResource TableWriteButton}"
-                                                                        Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}" />
+                                                                        Orientation="Horizontal">
+                                                                        <Button
+                                                                            Margin="0,0,6,0"
+                                                                            Padding="8,2"
+                                                                            Command="{Binding DataContext.ShowTagTrendCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Content="曲线"
+                                                                            FontSize="11"
+                                                                            Style="{StaticResource TableWriteButton}" />
+                                                                        <Button
+                                                                            Padding="8,2"
+                                                                            Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Content="写入"
+                                                                            FontSize="11"
+                                                                            Style="{StaticResource TableWriteButton}"
+                                                                            Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}" />
+                                                                    </StackPanel>
                                                                 </Grid>
                                                                 <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
                                                                     <Ellipse
@@ -476,8 +490,18 @@
                                                                         Foreground="{StaticResource TextSecondary}"
                                                                         Text="{Binding Timestamp, Converter={StaticResource TimestampToText}}" />
                                                                 </StackPanel>
+                                                                <ctrl:TrendChart
+                                                                    Height="46"
+                                                                    Margin="0,4,0,8"
+                                                                    Buffer="{Binding Trend}"
+                                                                    ClickCommand="{Binding DataContext.ShowTagTrendCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                    ClickCommandParameter="{Binding}"
+                                                                    Compact="True"
+                                                                    Cursor="Hand"
+                                                                    DockPanel.Dock="Bottom"
+                                                                    LineBrush="{StaticResource Accent}"
+                                                                    ToolTip="点击查看曲线" />
                                                                 <TextBlock
-                                                                    Margin="0,4,0,10"
                                                                     VerticalAlignment="Center"
                                                                     FontFamily="Consolas, Cascadia Mono, Microsoft YaHei UI"
                                                                     FontSize="22"
@@ -595,8 +619,8 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTemplateColumn
-                                                Width="1.4*"
-                                                MinWidth="110"
+                                                Width="1.8*"
+                                                MinWidth="160"
                                                 Header="操作">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
@@ -607,6 +631,12 @@
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center"
                                                             Orientation="Horizontal">
+                                                            <Button
+                                                                Margin="0,0,6,0"
+                                                                Command="{Binding DataContext.ShowTagTrendCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                CommandParameter="{Binding}"
+                                                                Content="曲线"
+                                                                Style="{StaticResource TableWriteButton}" />
                                                             <Button
                                                                 Margin="0,0,6,0"
                                                                 Command="{Binding DataContext.EditTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"

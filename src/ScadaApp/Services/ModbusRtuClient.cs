@@ -101,6 +101,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
             raw = ParseRegisters(registers, tag.DataType);
 
             result.RawValue = raw;
+            result.NumericValue = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
             result.DisplayValue = FormatValue(raw, tag);
             result.Quality = "Good";
         }
