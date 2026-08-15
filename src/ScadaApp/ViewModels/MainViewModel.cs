@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -11,6 +12,7 @@ namespace ScadaApp.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly IChannelManager _channelManager;
+    private readonly TrendStore _trends = new();
     private readonly SynchronizationContext? _uiContext;
 
     [ObservableProperty] private ChannelItemViewModel? _selectedChannel;
@@ -94,6 +96,11 @@ public partial class MainViewModel : ObservableObject
             return;
 
         var name = SelectedChannel.Name;
+        foreach (var tag in SelectedChannel.Config.Tags)
+        {
+            _trends.Remove(tag.Id);
+            TagTrendWindow.CloseIfOpen(tag.Id);
+        }
         await _channelManager.RemoveChannelAsync(SelectedChannel.Id);
         ConfigStorage.Save(_channelManager.Channels);
         LoadChannels();
@@ -240,6 +247,8 @@ public partial class MainViewModel : ObservableObject
             return;
 
         SelectedChannel.Config.Tags.RemoveAll(t => t.Id == tag.TagId);
+        _trends.Remove(tag.TagId);
+        TagTrendWindow.CloseIfOpen(tag.TagId);
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
         LoadTagsForChannel(SelectedChannel);
@@ -269,6 +278,14 @@ public partial class MainViewModel : ObservableObject
         {
             MessageDialog.Alert("写入失败", ex.Message);
         }
+    }
+
+    [RelayCommand]
+    private void ShowTagTrend(TagItemViewModel? tag)
+    {
+        if (tag == null) return;
+        TagTrendWindow.Show(tag, Application.Current.MainWindow);
+        StatusText = $"已打开曲线: {tag.Name}";
     }
 
     private void LoadFromStorage()
@@ -310,19 +327,29 @@ public partial class MainViewModel : ObservableObject
 
         foreach (var tag in channel.Config.Tags)
         {
-            var vm = new TagItemViewModel(_channelManager, channel.Config, tag);
+            var vm = new TagItemViewModel(_channelManager, channel.Config, tag, _trends.GetOrCreate(tag.Id));
             var running = _channelManager.GetRunningChannel(channel.Id);
             if (running?.TagValues.TryGetValue(tag.Id, out var value) == true && value != null)
-                vm.Update(value);
+                vm.Update(value, recordTrend: false);
             Tags.Add(vm);
         }
+        TagTrendWindow.RebindAll(Tags);
         RefreshSummary();
     }
 
     private void UpdateTagValue(TagValue value)
     {
         var tag = Tags.FirstOrDefault(t => t.TagId == value.TagId);
-        tag?.Update(value);
+        if (tag != null)
+        {
+            tag.Update(value);
+        }
+        else if (value.Quality == "Good" && value.NumericValue is double number)
+        {
+            _trends.GetOrCreate(value.TagId).Add(
+                value.Timestamp == default ? DateTime.Now : value.Timestamp,
+                number);
+        }
 
         var channel = Channels.FirstOrDefault(c =>
             c.Config.Tags.Any(t => t.Id == value.TagId));

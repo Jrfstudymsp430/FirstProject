@@ -15,13 +15,17 @@ public partial class TagItemViewModel : ObservableObject
     [ObservableProperty] private string _quality = "Bad";
     [ObservableProperty] private DateTime _timestamp;
     [ObservableProperty] private string? _errorMessage;
+    [ObservableProperty] private double? _numericValue;
 
-    public TagItemViewModel(IChannelManager channelManager, ChannelConfig channel, TagPoint tag)
+    public TagItemViewModel(IChannelManager channelManager, ChannelConfig channel, TagPoint tag, TrendBuffer trend)
     {
         _channelManager = channelManager;
         _channel = channel;
         _tag = tag;
+        Trend = trend;
     }
+
+    public TrendBuffer Trend { get; }
 
     public string TagId => _tag.Id;
     public string Name => _tag.Name;
@@ -39,13 +43,17 @@ public partial class TagItemViewModel : ObservableObject
     public bool IsWritable => _tag.IsWritable;
     public string ChannelName => _channel.Name;
 
-    public void Update(TagValue value)
+    public void Update(TagValue value, bool recordTrend = true)
     {
         if (value.TagId != TagId) return;
         DisplayValue = value.DisplayValue;
         Quality = value.Quality;
         Timestamp = value.Timestamp;
         ErrorMessage = value.ErrorMessage;
+        NumericValue = value.NumericValue;
+
+        if (recordTrend && value.Quality == "Good" && value.NumericValue is double number)
+            Trend.Add(value.Timestamp == default ? DateTime.Now : value.Timestamp, number);
     }
 
     public async Task WriteAsync(string input)

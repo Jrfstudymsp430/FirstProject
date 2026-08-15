@@ -209,7 +209,7 @@
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="10" />
         <Setter Property="Padding" Value="14,12" />
-        <Setter Property="Width" Value="210" />
+        <Setter Property="Width" Value="248" />
         <Setter Property="Margin" Value="0,0,12,12" />
     </Style>
 
