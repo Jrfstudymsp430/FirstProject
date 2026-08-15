@@ -320,6 +320,11 @@
                                 <StackPanel Margin="0,14,0,0" DockPanel.Dock="Bottom">
                                     <Button
                                         Margin="0,0,0,8"
+                                        Command="{Binding EditChannelCommand}"
+                                        Content="通道参数"
+                                        Style="{StaticResource SecondaryButton}" />
+                                    <Button
+                                        Margin="0,0,0,8"
                                         Command="{Binding StartChannelCommand}"
                                         Content="启动通道"
                                         Style="{StaticResource SuccessButton}" />
@@ -384,11 +389,141 @@
                             </DockPanel>
                         </Border>
 
-                        <!--  右侧：实时数据  -->
+                        <!--  右侧：实时监视（上）+ 点表配置（下）  -->
                         <Grid Grid.Column="2">
-                            <Border Style="{StaticResource PanelCard}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1.6*" MinHeight="200" />
+                                <RowDefinition Height="8" />
+                                <RowDefinition Height="0.8*" MinHeight="150" />
+                            </Grid.RowDefinitions>
+
+                            <Border Grid.Row="0" Style="{StaticResource PanelCard}">
                                 <DockPanel>
-                                    <Grid Margin="0,0,0,12" DockPanel.Dock="Top">
+                                    <StackPanel
+                                        Margin="0,0,0,12"
+                                        DockPanel.Dock="Top"
+                                        Orientation="Horizontal">
+                                        <Border
+                                            Width="3"
+                                            Height="16"
+                                            Margin="0,0,10,0"
+                                            Background="{StaticResource AccentBarBrush}"
+                                            CornerRadius="2" />
+                                        <TextBlock Style="{StaticResource SectionTitle}" Text="实时监视" />
+                                        <TextBlock
+                                            Margin="10,0,0,0"
+                                            VerticalAlignment="Center"
+                                            FontSize="12"
+                                            Foreground="{StaticResource TextSecondary}"
+                                            Text="{Binding SelectedChannel.Config.Name}" />
+                                        <Border
+                                            Margin="12,0,0,0"
+                                            Padding="8,3"
+                                            Background="#2200B4D8"
+                                            CornerRadius="10">
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{StaticResource AccentBlue}"
+                                                Text="{Binding TagCount, StringFormat={}{0} 点}" />
+                                        </Border>
+                                    </StackPanel>
+                                    <Grid>
+                                        <ScrollViewer
+                                            HorizontalScrollBarVisibility="Disabled"
+                                            VerticalScrollBarVisibility="Auto">
+                                            <ItemsControl ItemsSource="{Binding Tags}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <WrapPanel />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Border Style="{StaticResource DataMonitorCard}">
+                                                            <DockPanel>
+                                                                <Grid Margin="0,0,0,8" DockPanel.Dock="Top">
+                                                                    <TextBlock
+                                                                        FontSize="13"
+                                                                        FontWeight="SemiBold"
+                                                                        Foreground="{StaticResource TextPrimary}"
+                                                                        Text="{Binding Name}" />
+                                                                    <Button
+                                                                        Padding="8,2"
+                                                                        HorizontalAlignment="Right"
+                                                                        Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                                        CommandParameter="{Binding}"
+                                                                        Content="写入"
+                                                                        FontSize="11"
+                                                                        Style="{StaticResource TableWriteButton}"
+                                                                        Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}" />
+                                                                </Grid>
+                                                                <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
+                                                                    <Ellipse
+                                                                        Width="8"
+                                                                        Height="8"
+                                                                        Margin="0,0,6,0"
+                                                                        VerticalAlignment="Center"
+                                                                        Fill="{Binding Quality, Converter={StaticResource QualityToBrush}}" />
+                                                                    <TextBlock
+                                                                        VerticalAlignment="Center"
+                                                                        FontSize="11"
+                                                                        Foreground="{StaticResource TextSecondary}"
+                                                                        Text="{Binding Quality}" />
+                                                                    <TextBlock
+                                                                        Margin="10,0,0,0"
+                                                                        VerticalAlignment="Center"
+                                                                        FontSize="11"
+                                                                        Foreground="{StaticResource TextSecondary}"
+                                                                        Text="{Binding Timestamp, Converter={StaticResource TimestampToText}}" />
+                                                                </StackPanel>
+                                                                <TextBlock
+                                                                    Margin="0,4,0,10"
+                                                                    VerticalAlignment="Center"
+                                                                    FontFamily="Consolas, Cascadia Mono, Microsoft YaHei UI"
+                                                                    FontSize="22"
+                                                                    FontWeight="Bold"
+                                                                    Foreground="{StaticResource Accent}"
+                                                                    Text="{Binding DisplayValue}" />
+                                                            </DockPanel>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </ScrollViewer>
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontSize="13"
+                                            Foreground="{StaticResource TextSecondary}"
+                                            Text="暂无实时数据，请在下方点表配置中添加标签">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding TagCount}" Value="0">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Grid>
+                                </DockPanel>
+                            </Border>
+
+                            <GridSplitter
+                                Grid.Row="1"
+                                Height="8"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                Background="Transparent"
+                                Cursor="SizeNS"
+                                ResizeDirection="Rows"
+                                ShowsPreview="False" />
+
+                            <Border Grid.Row="2" Style="{StaticResource PanelCard}">
+                                <DockPanel>
+                                    <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                                             <Border
                                                 Width="3"
@@ -396,31 +531,14 @@
                                                 Margin="0,0,10,0"
                                                 Background="{StaticResource AccentBarBrush}"
                                                 CornerRadius="2" />
-                                            <TextBlock Style="{StaticResource SectionTitle}" Text="实时数据点" />
-                                            <Border
-                                                Margin="12,0,0,0"
-                                                Padding="8,3"
-                                                Background="#2200B4D8"
-                                                CornerRadius="10">
-                                                <TextBlock
-                                                    FontSize="11"
-                                                    Foreground="{StaticResource AccentBlue}"
-                                                    Text="{Binding TagCount, StringFormat={}{0} 点}" />
-                                            </Border>
+                                            <TextBlock Style="{StaticResource SectionTitle}" Text="点表配置" />
                                         </StackPanel>
-                                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                                            <Button
-                                                Margin="0,0,8,0"
-                                                Command="{Binding EditChannelCommand}"
-                                                Content="通道参数"
-                                                Style="{StaticResource SecondaryButton}" />
-                                            <Button
-                                                Command="{Binding AddTagCommand}"
-                                                Content="＋ 添加标签"
-                                                Style="{StaticResource SecondaryButton}" />
-                                        </StackPanel>
+                                        <Button
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding AddTagCommand}"
+                                            Content="＋ 添加标签"
+                                            Style="{StaticResource SecondaryButton}" />
                                     </Grid>
-
                                     <DataGrid
                                         HorizontalAlignment="Stretch"
                                         ColumnWidth="*"
@@ -438,18 +556,6 @@
                                                 </DataGridTextColumn.HeaderStyle>
                                                 <DataGridTextColumn.ElementStyle>
                                                     <Style BasedOn="{StaticResource DataGridCellLeft}" TargetType="TextBlock" />
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-                                            <DataGridTextColumn
-                                                Width="0.7*"
-                                                MinWidth="48"
-                                                Binding="{Binding SlaveId}"
-                                                Header="从站">
-                                                <DataGridTextColumn.HeaderStyle>
-                                                    <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
-                                                </DataGridTextColumn.HeaderStyle>
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style BasedOn="{StaticResource DataGridCellCenter}" TargetType="TextBlock" />
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTextColumn
@@ -489,36 +595,9 @@
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
                                             <DataGridTemplateColumn
-                                                Width="1.2*"
-                                                MinWidth="80"
-                                                Header="当前值">
-                                                <DataGridTemplateColumn.HeaderStyle>
-                                                    <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
-                                                </DataGridTemplateColumn.HeaderStyle>
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Border
-                                                            MinWidth="56"
-                                                            Padding="8,4"
-                                                            HorizontalAlignment="Stretch"
-                                                            VerticalAlignment="Center"
-                                                            Background="#1500D4AA"
-                                                            CornerRadius="4">
-                                                            <TextBlock
-                                                                HorizontalAlignment="Center"
-                                                                FontSize="13"
-                                                                FontWeight="Bold"
-                                                                Foreground="{StaticResource Accent}"
-                                                                Text="{Binding DisplayValue}"
-                                                                TextAlignment="Center" />
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                            <DataGridTemplateColumn
-                                                Width="0.8*"
-                                                MinWidth="56"
-                                                Header="质量">
+                                                Width="1.4*"
+                                                MinWidth="110"
+                                                Header="操作">
                                                 <DataGridTemplateColumn.HeaderStyle>
                                                     <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
                                                 </DataGridTemplateColumn.HeaderStyle>
@@ -528,71 +607,18 @@
                                                             HorizontalAlignment="Center"
                                                             VerticalAlignment="Center"
                                                             Orientation="Horizontal">
-                                                            <Ellipse
-                                                                Width="8"
-                                                                Height="8"
-                                                                VerticalAlignment="Center"
-                                                                Fill="{Binding Quality, Converter={StaticResource QualityToBrush}}" />
-                                                            <TextBlock
-                                                                Margin="6,0,0,0"
-                                                                VerticalAlignment="Center"
-                                                                FontSize="11"
-                                                                Foreground="{StaticResource TextSecondary}"
-                                                                Text="{Binding Quality}" />
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                            <DataGridTextColumn
-                                                Width="1.1*"
-                                                MinWidth="72"
-                                                Binding="{Binding Timestamp, Converter={StaticResource TimestampToText}}"
-                                                Header="更新时间">
-                                                <DataGridTextColumn.HeaderStyle>
-                                                    <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
-                                                </DataGridTextColumn.HeaderStyle>
-                                                <DataGridTextColumn.ElementStyle>
-                                                    <Style BasedOn="{StaticResource DataGridCellCenter}" TargetType="TextBlock" />
-                                                </DataGridTextColumn.ElementStyle>
-                                            </DataGridTextColumn>
-                                            <DataGridTemplateColumn
-                                                Width="1.8*"
-                                                MinWidth="180"
-                                                Header="操作">
-                                                <DataGridTemplateColumn.HeaderStyle>
-                                                    <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
-                                                </DataGridTemplateColumn.HeaderStyle>
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Grid
-                                                            Margin="0,0,10,0"
-                                                            HorizontalAlignment="Stretch"
-                                                            VerticalAlignment="Center">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="*" />
-                                                            </Grid.ColumnDefinitions>
                                                             <Button
-                                                                Grid.Column="0"
+                                                                Margin="0,0,6,0"
                                                                 Command="{Binding DataContext.EditTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}"
                                                                 Content="编辑"
                                                                 Style="{StaticResource TableActionButton}" />
                                                             <Button
-                                                                Grid.Column="1"
-                                                                Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                CommandParameter="{Binding}"
-                                                                Content="写入"
-                                                                Style="{StaticResource TableWriteButton}"
-                                                                Visibility="{Binding IsWritable, Converter={StaticResource BoolToHiddenVis}}" />
-                                                            <Button
-                                                                Grid.Column="2"
                                                                 Command="{Binding DataContext.RemoveTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                                                 CommandParameter="{Binding}"
                                                                 Content="删除"
                                                                 Style="{StaticResource TableDangerButton}" />
-                                                        </Grid>
+                                                        </StackPanel>
                                                     </DataTemplate>
                                                 </DataGridTemplateColumn.CellTemplate>
                                             </DataGridTemplateColumn>
