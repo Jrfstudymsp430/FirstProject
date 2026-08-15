@@ -62,13 +62,90 @@
                     </Button>
                 </Grid>
             </Border>
+            <Grid Margin="22,18,22,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
 
-            <Border
-                Padding="16,12"
-                BorderBrush="{StaticResource BorderColor}"
-                BorderThickness="0,1,0,0"
-                DockPanel.Dock="Bottom">
-                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                <TextBlock
+                    Grid.Row="0"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="通道名称" />
+                <TextBox
+                    Grid.Row="0"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock
+                    Grid.Row="1"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="串口" />
+                <ComboBox
+                    x:Name="PortCombo"
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    VerticalAlignment="Center"
+                    IsEditable="True"
+                    Text="{Binding PortName, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock
+                    Grid.Row="2"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="波特率" />
+                <ComboBox
+                    x:Name="BaudCombo"
+                    Grid.Row="2"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    VerticalAlignment="Center"
+                    SelectedItem="{Binding BaudRate}" />
+
+                <TextBlock
+                    Grid.Row="3"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="从机ID" />
+                <TextBox
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Grid.ColumnSpan="2"
+                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock
+                    Grid.Row="4"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="轮询间隔(ms)" />
+                <TextBox
+                    Grid.Row="4"
+                    Grid.Column="1"
+                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
+                    Text="{Binding PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}" />
+                <StackPanel
+                    Grid.Row="5"
+                    Grid.ColumnSpan="2"
+                    Margin="0,10,0,10"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
                     <Button
                         Width="84"
                         Height="32"
@@ -87,71 +164,6 @@
                         IsDefault="True"
                         Style="{StaticResource SuccessButton}" />
                 </StackPanel>
-            </Border>
-
-            <Grid Margin="22,18,22,8">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="76" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="28" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
-                </Grid.RowDefinitions>
-
-                <TextBlock Grid.Row="0" Style="{StaticResource DialogFieldLabel}" Text="通道名称" />
-                <TextBox
-                    Grid.Row="0"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    VerticalAlignment="Center"
-                    Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
-
-                <TextBlock Grid.Row="1" Style="{StaticResource DialogFieldLabel}" Text="串口" />
-                <ComboBox
-                    x:Name="PortCombo"
-                    Grid.Row="1"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    VerticalAlignment="Center"
-                    IsEditable="True"
-                    Text="{Binding PortName, UpdateSourceTrigger=PropertyChanged}" />
-
-                <TextBlock Grid.Row="2" Style="{StaticResource DialogFieldLabel}" Text="波特率" />
-                <ComboBox
-                    x:Name="BaudCombo"
-                    Grid.Row="2"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    VerticalAlignment="Center"
-                    SelectedItem="{Binding BaudRate}" />
-
-                <TextBlock Grid.Row="3" Style="{StaticResource DialogFieldLabel}" Text="从机ID" />
-                <TextBox
-                    Grid.Row="3"
-                    Grid.Column="1"
-                    Grid.ColumnSpan="2"
-                    VerticalAlignment="Center"
-                    Text="{Binding SlaveId, UpdateSourceTrigger=PropertyChanged}" />
-
-                <TextBlock Grid.Row="4" Style="{StaticResource DialogFieldLabel}" Text="轮询间隔" />
-                <TextBox
-                    Grid.Row="4"
-                    Grid.Column="1"
-                    VerticalAlignment="Center"
-                    Text="{Binding PollingIntervalMs, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock
-                    Grid.Row="4"
-                    Grid.Column="2"
-                    Margin="8,0,0,0"
-                    VerticalAlignment="Center"
-                    FontSize="12"
-                    Foreground="{StaticResource TextSecondary}"
-                    Text="ms" />
             </Grid>
         </DockPanel>
     </Border>
