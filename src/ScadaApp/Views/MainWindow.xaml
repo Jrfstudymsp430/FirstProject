@@ -124,7 +124,7 @@
                         Fill="{StaticResource AccentBlue}" />
                 </Canvas>
 
-                <Grid Margin="16">
+                <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -429,9 +429,7 @@
                                         </Border>
                                     </StackPanel>
                                     <Grid>
-                                        <ScrollViewer
-                                            HorizontalScrollBarVisibility="Disabled"
-                                            VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <ItemsControl ItemsSource="{Binding Tags}">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
@@ -450,9 +448,7 @@
                                                                         Foreground="{StaticResource TextPrimary}"
                                                                         Text="{Binding Name}"
                                                                         TextTrimming="CharacterEllipsis" />
-                                                                    <StackPanel
-                                                                        HorizontalAlignment="Right"
-                                                                        Orientation="Horizontal">
+                                                                    <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                                                                         <Button
                                                                             Margin="0,0,6,0"
                                                                             Padding="8,2"
