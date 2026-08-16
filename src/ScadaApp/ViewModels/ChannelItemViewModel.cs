@@ -10,6 +10,8 @@ public partial class ChannelItemViewModel : ObservableObject
 
     [ObservableProperty] private ChannelState _state = ChannelState.Disconnected;
     [ObservableProperty] private bool _isRunning;
+    [ObservableProperty] private long _txCount;
+    [ObservableProperty] private long _rxCount;
 
     public ChannelItemViewModel(IChannelManager channelManager, ChannelConfig config)
     {
@@ -35,10 +37,14 @@ public partial class ChannelItemViewModel : ObservableObject
     public int BaudRate => Config.BaudRate;
     public int TagCount => Config.Tags.Count;
     public string Summary => $"{Config.PortName} @ {Config.BaudRate} | {Config.Tags.Count} 点";
+    public string PacketStats => $"发 {TxCount}  收 {RxCount}";
 
     public void RefreshState()
     {
         var running = _channelManager.GetRunningChannel(Config.Id);
+        var traffic = _channelManager.GetTraffic(Config.Id);
+        TxCount = traffic.TxCount;
+        RxCount = traffic.RxCount;
         if (running != null)
         {
             State = running.State;
@@ -50,5 +56,6 @@ public partial class ChannelItemViewModel : ObservableObject
             IsRunning = false;
         }
         OnPropertyChanged(nameof(Summary));
+        OnPropertyChanged(nameof(PacketStats));
     }
 }

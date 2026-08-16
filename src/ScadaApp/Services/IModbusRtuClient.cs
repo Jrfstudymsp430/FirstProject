@@ -5,6 +5,8 @@ namespace ScadaApp.Services;
 public interface IModbusRtuClient : IDisposable
 {
     bool IsConnected { get; }
+    long TxCount { get; }
+    long RxCount { get; }
     Task ConnectAsync(CancellationToken cancellationToken = default);
     Task DisconnectAsync();
     Task<TagValue> ReadTagAsync(TagPoint tag, CancellationToken cancellationToken = default);

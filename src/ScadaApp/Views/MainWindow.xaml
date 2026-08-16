@@ -377,11 +377,30 @@
                                                             Text="{Binding State, Converter={StaticResource ChannelStateToLabel}}" />
                                                     </Border>
                                                 </Grid>
-                                                <StackPanel Margin="16,6,0,0" Orientation="Horizontal">
+                                                <StackPanel Margin="16,6,0,0">
                                                     <TextBlock
                                                         FontSize="11"
                                                         Foreground="{StaticResource TextSecondary}"
                                                         Text="{Binding Summary}" />
+                                                    <StackPanel Margin="0,3,0,0" Orientation="Horizontal">
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            Foreground="{StaticResource TextSecondary}"
+                                                            Text="发 " />
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            Foreground="{StaticResource Accent}"
+                                                            Text="{Binding TxCount}" />
+                                                        <TextBlock
+                                                            Margin="10,0,0,0"
+                                                            FontSize="11"
+                                                            Foreground="{StaticResource TextSecondary}"
+                                                            Text="收 " />
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            Foreground="{StaticResource AccentBlue}"
+                                                            Text="{Binding RxCount}" />
+                                                    </StackPanel>
                                                 </StackPanel>
                                             </StackPanel>
                                         </DataTemplate>
@@ -758,6 +777,11 @@
                                 HorizontalAlignment="Right"
                                 VerticalAlignment="Center"
                                 Orientation="Horizontal">
+                                <TextBlock
+                                    Margin="0,0,14,0"
+                                    FontSize="11"
+                                    Foreground="{StaticResource Accent}"
+                                    Text="{Binding SelectedChannel.PacketStats}" />
                                 <TextBlock
                                     Margin="0,0,14,0"
                                     FontSize="11"

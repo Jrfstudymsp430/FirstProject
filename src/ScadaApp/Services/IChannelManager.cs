@@ -22,4 +22,5 @@ public interface IChannelManager
     Task WriteTagAsync(string channelId, string tagId, object value, CancellationToken cancellationToken = default);
     Task WriteTagsAsync(string channelId, IReadOnlyList<(string TagId, object Value)> items, CancellationToken cancellationToken = default);
     IChannelService? GetRunningChannel(string channelId);
+    (long TxCount, long RxCount) GetTraffic(string channelId);
 }

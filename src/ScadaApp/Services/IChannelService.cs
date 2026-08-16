@@ -6,6 +6,8 @@ public interface IChannelService
 {
     ChannelConfig Config { get; }
     ChannelState State { get; }
+    long TxCount { get; }
+    long RxCount { get; }
     IReadOnlyDictionary<string, TagValue> TagValues { get; }
     event EventHandler? StateChanged;
     event EventHandler<TagValue>? TagValueUpdated;

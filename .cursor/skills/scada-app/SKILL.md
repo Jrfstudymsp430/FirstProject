@@ -71,6 +71,7 @@ dotnet run --project src/ScadaApp/ScadaApp.csproj
 - `TagValue.NumericValue` 为缩放后的数值；曲线只记 `Quality == Good`。
 - `TrendStore` 按 tagId 复用缓冲，刷新点表不能丢历史。
 - 清空日志不得把「已连接」改成离线。
+- 通道卡片和状态栏显示收发报文数：每次 Modbus 请求 +1 发，收到应答 +1 收。超时/失败只计发。停止后保留本次计数，重新启动从 0 开始。
 
 ## 退出
 

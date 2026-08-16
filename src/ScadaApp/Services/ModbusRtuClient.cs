@@ -14,6 +14,8 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     private SerialPort? _serialPort;
     private IModbusMaster? _master;
     private readonly SemaphoreSlim _lock = new(1, 1);
+    private long _txCount;
+    private long _rxCount;
 
     public ModbusRtuClient(ChannelConfig config)
     {
@@ -21,6 +23,8 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     }
 
     public bool IsConnected => _serialPort?.IsOpen == true;
+    public long TxCount => Interlocked.Read(ref _txCount);
+    public long RxCount => Interlocked.Read(ref _rxCount);
 
     public async Task ConnectAsync(CancellationToken cancellationToken = default)
     {
@@ -95,9 +99,23 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         {
             object raw;
             // 采集统一使用 03 读保持寄存器
-            var registers = await Task.Run(
-                () => _master!.ReadHoldingRegisters(tag.SlaveId, tag.Address, tag.RegisterCount),
-                cancellationToken).ConfigureAwait(false);
+            Interlocked.Increment(ref _txCount);
+            ushort[] registers;
+            try
+            {
+                registers = await Task.Run(
+                    () => _master!.ReadHoldingRegisters(tag.SlaveId, tag.Address, tag.RegisterCount),
+                    cancellationToken).ConfigureAwait(false);
+                Interlocked.Increment(ref _rxCount);
+            }
+            catch (Exception ex)
+            {
+                result.Quality = "Bad";
+                result.ErrorMessage = ex.Message;
+                result.DisplayValue = "ERR";
+                return result;
+            }
+
             raw = ParseRegisters(registers, tag.DataType);
 
             result.RawValue = raw;
@@ -134,12 +152,14 @@ public sealed class ModbusRtuClient : IModbusRtuClient
             {
                 case ModbusFunctionCode.WriteSingleRegister:
                     var reg = Convert.ToUInt16(value);
-                    await Task.Run(() => _master!.WriteSingleRegister(tag.SlaveId, tag.Address, reg), cancellationToken).ConfigureAwait(false);
+                    await TrackAsync(
+                        () => Task.Run(() => _master!.WriteSingleRegister(tag.SlaveId, tag.Address, reg), cancellationToken)).ConfigureAwait(false);
                     break;
 
                 case ModbusFunctionCode.WriteMultipleRegisters:
                     var registers = EncodeRegisters(value, tag.DataType);
-                    await Task.Run(() => _master!.WriteMultipleRegisters(tag.SlaveId, tag.Address, registers), cancellationToken).ConfigureAwait(false);
+                    await TrackAsync(
+                        () => Task.Run(() => _master!.WriteMultipleRegisters(tag.SlaveId, tag.Address, registers), cancellationToken)).ConfigureAwait(false);
                     break;
 
                 default:
@@ -167,14 +187,22 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            await Task.Run(
-                () => _master!.WriteMultipleRegisters(slaveId, startAddress, registers),
-                cancellationToken).ConfigureAwait(false);
+            await TrackAsync(
+                () => Task.Run(
+                    () => _master!.WriteMultipleRegisters(slaveId, startAddress, registers),
+                    cancellationToken)).ConfigureAwait(false);
         }
         finally
         {
             _lock.Release();
         }
+    }
+
+    private async Task TrackAsync(Func<Task> send)
+    {
+        Interlocked.Increment(ref _txCount);
+        await send().ConfigureAwait(false);
+        Interlocked.Increment(ref _rxCount);
     }
 
     public static ushort[] EncodeValue(object value, TagDataType dataType) =>
