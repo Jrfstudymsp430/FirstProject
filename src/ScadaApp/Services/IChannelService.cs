@@ -14,4 +14,5 @@ public interface IChannelService
     Task StartAsync(CancellationToken cancellationToken = default);
     Task StopAsync();
     Task WriteTagAsync(string tagId, object value, CancellationToken cancellationToken = default);
+    Task WriteTagsAsync(IReadOnlyList<(string TagId, object Value)> items, CancellationToken cancellationToken = default);
 }

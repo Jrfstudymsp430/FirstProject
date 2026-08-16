@@ -102,6 +102,46 @@ public sealed class ChannelService : IChannelService, IDisposable
         TagValueUpdated?.Invoke(this, updated);
     }
 
+    public async Task WriteTagsAsync(
+        IReadOnlyList<(string TagId, object Value)> items,
+        CancellationToken cancellationToken = default)
+    {
+        if (_client == null)
+            throw new InvalidOperationException("通道未连接");
+
+        if (items.Count == 0)
+            return;
+
+        var resolved = new List<(TagPoint Tag, object Value)>(items.Count);
+        foreach (var (tagId, value) in items)
+        {
+            var tag = _config.Tags.FirstOrDefault(t => t.Id == tagId)
+                ?? throw new ArgumentException($"未找到标签: {tagId}");
+            resolved.Add((tag, value));
+        }
+
+        var ordered = resolved.OrderBy(i => i.Tag.Address).ToList();
+        TagBlockWriter.EnsureWritableConsecutive(ordered.Select(i => i.Tag).ToList());
+
+        foreach (var chunk in TagBlockWriter.SplitByPduLimit(ordered))
+        {
+            var registers = TagBlockWriter.EncodeBlock(chunk);
+            var start = chunk[0].Tag.Address;
+            await _client.WriteRegistersAsync(chunk[0].Tag.SlaveId, start, registers, cancellationToken)
+                .ConfigureAwait(false);
+
+            var names = string.Join("、", chunk.Select(i => $"{i.Tag.Name}={i.Value}"));
+            AddLog("Info", $"功能码 16 连续写入 {chunk.Count} 点 @{start}：{names}");
+        }
+
+        foreach (var (tag, _) in ordered)
+        {
+            var updated = await _client.ReadTagAsync(tag, cancellationToken).ConfigureAwait(false);
+            _tagValues[tag.Id] = updated;
+            TagValueUpdated?.Invoke(this, updated);
+        }
+    }
+
     private async Task PollLoopAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)

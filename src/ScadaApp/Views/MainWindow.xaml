@@ -557,18 +557,28 @@
                                                 CornerRadius="2" />
                                             <TextBlock Style="{StaticResource SectionTitle}" Text="点表配置" />
                                         </StackPanel>
-                                        <Button
-                                            HorizontalAlignment="Right"
-                                            Command="{Binding AddTagCommand}"
-                                            Content="＋ 添加标签"
-                                            Style="{StaticResource SecondaryButton}" />
+                                        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
+                                            <Button
+                                                Margin="0,0,8,0"
+                                                Command="{Binding WriteTagsBatchCommand}"
+                                                Content="批量写入"
+                                                Style="{StaticResource SecondaryButton}" />
+                                            <Button
+                                                Command="{Binding AddTagCommand}"
+                                                Content="＋ 添加标签"
+                                                Style="{StaticResource SecondaryButton}" />
+                                        </StackPanel>
                                     </Grid>
                                     <DataGrid
+                                        x:Name="TagGrid"
                                         HorizontalAlignment="Stretch"
                                         ColumnWidth="*"
                                         HorizontalScrollBarVisibility="Disabled"
                                         ItemsSource="{Binding Tags}"
-                                        RowHeaderWidth="0">
+                                        RowHeaderWidth="0"
+                                        SelectionChanged="TagGrid_SelectionChanged"
+                                        SelectionMode="Extended"
+                                        SelectionUnit="FullRow">
                                         <DataGrid.Columns>
                                             <DataGridTextColumn
                                                 Width="1.2*"
