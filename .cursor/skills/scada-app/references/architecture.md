@@ -46,6 +46,8 @@ Helpers/        WindowWorkAreaHelper
 
 监视卡片：`DataMonitorCard`，绑定 `Tags`。曲线按钮走 `ShowTagTrendCommand`。
 
+通道列表摘要：`COM @ 波特率 | n 点`，下一行 `发 / 收` 绑定 `TxCount`/`RxCount`。通道名绿色是用户本地样式，不要改。
+
 ## 窗口清单
 
 | 窗口 | 用途 |

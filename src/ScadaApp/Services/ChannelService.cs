@@ -15,6 +15,8 @@ public sealed class ChannelService : IChannelService, IDisposable
     private readonly ConcurrentDictionary<string, TagValue> _tagValues = new();
     private readonly ConcurrentDictionary<string, string> _lastErrors = new();
     private ChannelState _state = ChannelState.Disconnected;
+    private long _lastTx;
+    private long _lastRx;
 
     public ChannelService(ChannelConfig config)
     {
@@ -27,6 +29,8 @@ public sealed class ChannelService : IChannelService, IDisposable
 
     public ChannelConfig Config => _config;
     public ChannelState State => _state;
+    public long TxCount => _client?.TxCount ?? _lastTx;
+    public long RxCount => _client?.RxCount ?? _lastRx;
     public IReadOnlyDictionary<string, TagValue> TagValues => _tagValues;
     public event EventHandler? StateChanged;
     public event EventHandler<TagValue>? TagValueUpdated;
@@ -77,6 +81,8 @@ public sealed class ChannelService : IChannelService, IDisposable
 
         if (_client != null)
         {
+            _lastTx = _client.TxCount;
+            _lastRx = _client.RxCount;
             await _client.DisconnectAsync().ConfigureAwait(false);
             _client.Dispose();
             _client = null;

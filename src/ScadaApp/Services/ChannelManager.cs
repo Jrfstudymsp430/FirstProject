@@ -9,6 +9,7 @@ public sealed class ChannelManager : IChannelManager
 {
     private readonly List<ChannelConfig> _channels = new();
     private readonly Dictionary<string, IChannelService> _running = new();
+    private readonly Dictionary<string, (long Tx, long Rx)> _lastTraffic = new();
 
     public IReadOnlyList<ChannelConfig> Channels => _channels;
     public IReadOnlyList<IChannelService> RunningChannels => _running.Values.ToList();
@@ -26,6 +27,7 @@ public sealed class ChannelManager : IChannelManager
     public void RemoveChannel(string channelId)
     {
         _channels.RemoveAll(c => c.Id == channelId);
+        _lastTraffic.Remove(channelId);
     }
 
     public async Task RemoveChannelAsync(string channelId)
@@ -34,6 +36,7 @@ public sealed class ChannelManager : IChannelManager
             await StopChannelAsync(channelId).ConfigureAwait(false);
 
         _channels.RemoveAll(c => c.Id == channelId);
+        _lastTraffic.Remove(channelId);
     }
 
     public void UpdateChannel(ChannelConfig config)
@@ -77,6 +80,7 @@ public sealed class ChannelManager : IChannelManager
             return;
 
         await service.StopAsync().ConfigureAwait(false);
+        _lastTraffic[channelId] = (service.TxCount, service.RxCount);
         if (service is IDisposable disposable)
             disposable.Dispose();
         _running.Remove(channelId);
@@ -127,5 +131,13 @@ public sealed class ChannelManager : IChannelManager
     {
         _running.TryGetValue(channelId, out var service);
         return service;
+    }
+
+    public (long TxCount, long RxCount) GetTraffic(string channelId)
+    {
+        if (_running.TryGetValue(channelId, out var service))
+            return (service.TxCount, service.RxCount);
+
+        return _lastTraffic.TryGetValue(channelId, out var last) ? (last.Tx, last.Rx) : (0, 0);
     }
 }
