@@ -63,6 +63,7 @@
                     Grid.Row="0"
                     Grid.Column="1"
                     Margin="0,0,0,10"
+                    Padding="3,0,0,0"
                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
@@ -94,6 +95,7 @@
                     Grid.Row="2"
                     Grid.Column="1"
                     Margin="0,0,0,10"
+                    Padding="3,0,0,0"
                     Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
@@ -125,6 +127,7 @@
                     Grid.Row="4"
                     Grid.Column="1"
                     Margin="0,0,0,10"
+                    Padding="3,0,0,0"
                     Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
