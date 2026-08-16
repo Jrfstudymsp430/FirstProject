@@ -259,7 +259,13 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private async Task WriteTagAsync(TagItemViewModel? tag)
     {
-        if (tag == null || !tag.IsWritable) return;
+        if (tag == null) return;
+
+        if (!tag.IsWritable)
+        {
+            MessageDialog.Alert("写入数据", "该点功能码为 03，只读采集。请改为 06 或 16 后再单独写入。");
+            return;
+        }
 
         var defaultValue = tag.DisplayValue is "ERR" or "--" ? "0" : StripDisplayUnit(tag.DisplayValue);
         var input = InputDialog.Show(
@@ -300,10 +306,24 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
+        if (_selectedTags.Count <= 1)
+        {
+            if (_selectedTags.Count == 1)
+            {
+                await WriteTagAsync(_selectedTags[0]);
+                return;
+            }
+
+            MessageDialog.Alert(
+                "批量写入",
+                "单独写入请点该点的「写入」。批量写入请按住 Shift 或 Ctrl 选中 2 个以上地址连续的可写点。");
+            return;
+        }
+
         List<TagItemViewModel> targets;
         try
         {
-            targets = ResolveBatchWriteTags();
+            targets = _selectedTags.ToList();
             TagBlockWriter.EnsureWritableConsecutive(targets.Select(t => t.Point).ToList());
         }
         catch (Exception ex)
@@ -335,29 +355,6 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             MessageDialog.Alert("写入失败", ex.Message);
-        }
-    }
-
-    private List<TagItemViewModel> ResolveBatchWriteTags()
-    {
-        if (_selectedTags.Count >= 2)
-            return _selectedTags.ToList();
-
-        if (_selectedTags.Count == 1)
-            throw new InvalidOperationException("请按住 Ctrl 或 Shift 再选中相邻地址的可写点。");
-
-        var writable = Tags.Where(t => t.IsWritable).OrderBy(t => t.Address).ToList();
-        if (writable.Count < 2)
-            throw new InvalidOperationException("当前通道可写点不足 2 个。请把连续点的功能码设为 06 或 16，并在点表中连选。");
-
-        try
-        {
-            TagBlockWriter.EnsureWritableConsecutive(writable.Select(t => t.Point).ToList());
-            return writable;
-        }
-        catch (InvalidOperationException)
-        {
-            throw new InvalidOperationException("可写点地址不连续。请在点表中按住 Shift 选中一段首尾相接的点。");
         }
     }
 
