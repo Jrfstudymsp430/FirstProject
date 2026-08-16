@@ -42,6 +42,8 @@ public partial class TagItemViewModel : ObservableObject
     public string Unit => _tag.Unit;
     public bool IsWritable => _tag.IsWritable;
     public string ChannelName => _channel.Name;
+    public string ChannelId => _channel.Id;
+    public TagPoint Point => _tag;
 
     public void Update(TagValue value, bool recordTrend = true)
     {

@@ -31,6 +31,7 @@ public partial class MainViewModel : ObservableObject
     public ObservableCollection<TagItemViewModel> Tags { get; } = new();
     public ObservableCollection<LogItemViewModel> Logs { get; } = new();
     public ObservableCollection<string> AvailablePorts { get; } = new();
+    private readonly List<TagItemViewModel> _selectedTags = new();
 
     public int[] BaudRates => SerialPortHelper.CommonBaudRates;
     public Array FunctionCodes => Enum.GetValues(typeof(ModbusFunctionCode));
@@ -277,6 +278,86 @@ public partial class MainViewModel : ObservableObject
         catch (Exception ex)
         {
             MessageDialog.Alert("写入失败", ex.Message);
+        }
+    }
+
+    public void SyncSelectedTags(System.Collections.IList selected)
+    {
+        _selectedTags.Clear();
+        foreach (var item in selected)
+        {
+            if (item is TagItemViewModel tag)
+                _selectedTags.Add(tag);
+        }
+    }
+
+    [RelayCommand]
+    private async Task WriteTagsBatchAsync()
+    {
+        if (SelectedChannel == null)
+        {
+            MessageDialog.Alert("批量写入", "请先选择一个通道。");
+            return;
+        }
+
+        List<TagItemViewModel> targets;
+        try
+        {
+            targets = ResolveBatchWriteTags();
+            TagBlockWriter.EnsureWritableConsecutive(targets.Select(t => t.Point).ToList());
+        }
+        catch (Exception ex)
+        {
+            MessageDialog.Alert("批量写入", ex.Message);
+            return;
+        }
+
+        var rows = BatchWriteDialog.Show(targets);
+        if (rows == null || rows.Count == 0)
+            return;
+
+        try
+        {
+            var parsed = new List<(string TagId, object Value)>(rows.Count);
+            foreach (var row in rows)
+            {
+                var tag = targets.First(t => t.TagId == row.TagId);
+                parsed.Add((row.TagId, TagBlockWriter.ParseValue(tag.Point, row.Input)));
+            }
+
+            await _channelManager.WriteTagsAsync(SelectedChannel.Id, parsed);
+            StatusText = $"已连续写入 {parsed.Count} 个点";
+        }
+        catch (FormatException)
+        {
+            MessageDialog.Alert("批量写入", "写入值格式不正确。");
+        }
+        catch (Exception ex)
+        {
+            MessageDialog.Alert("写入失败", ex.Message);
+        }
+    }
+
+    private List<TagItemViewModel> ResolveBatchWriteTags()
+    {
+        if (_selectedTags.Count >= 2)
+            return _selectedTags.ToList();
+
+        if (_selectedTags.Count == 1)
+            throw new InvalidOperationException("请按住 Ctrl 或 Shift 再选中相邻地址的可写点。");
+
+        var writable = Tags.Where(t => t.IsWritable).OrderBy(t => t.Address).ToList();
+        if (writable.Count < 2)
+            throw new InvalidOperationException("当前通道可写点不足 2 个。请把连续点的功能码设为 06 或 16，并在点表中连选。");
+
+        try
+        {
+            TagBlockWriter.EnsureWritableConsecutive(writable.Select(t => t.Point).ToList());
+            return writable;
+        }
+        catch (InvalidOperationException)
+        {
+            throw new InvalidOperationException("可写点地址不连续。请在点表中按住 Shift 选中一段首尾相接的点。");
         }
     }
 

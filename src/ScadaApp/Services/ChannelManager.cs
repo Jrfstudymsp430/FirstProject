@@ -112,6 +112,17 @@ public sealed class ChannelManager : IChannelManager
         await service.WriteTagAsync(tagId, value, cancellationToken).ConfigureAwait(false);
     }
 
+    public async Task WriteTagsAsync(
+        string channelId,
+        IReadOnlyList<(string TagId, object Value)> items,
+        CancellationToken cancellationToken = default)
+    {
+        if (!_running.TryGetValue(channelId, out var service))
+            throw new InvalidOperationException("通道未运行");
+
+        await service.WriteTagsAsync(items, cancellationToken).ConfigureAwait(false);
+    }
+
     public IChannelService? GetRunningChannel(string channelId)
     {
         _running.TryGetValue(channelId, out var service);

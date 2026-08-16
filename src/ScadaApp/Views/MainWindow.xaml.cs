@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 using ScadaApp.Helpers;
@@ -118,5 +119,11 @@ public partial class MainWindow : Window
             ? System.Windows.Media.Geometry.Parse("M3,1 H10 V8 M1,3 H8 V10 H1 Z")
             : System.Windows.Media.Geometry.Parse("M1,1 H9 V9 H1 Z");
         MaximizeButton.ToolTip = _isMaximized ? "还原" : "最大化";
+    }
+
+    private void TagGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is MainViewModel vm && sender is DataGrid grid)
+            vm.SyncSelectedTags(grid.SelectedItems);
     }
 }

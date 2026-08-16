@@ -152,6 +152,34 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         }
     }
 
+    public async Task WriteRegistersAsync(
+        byte slaveId,
+        ushort startAddress,
+        ushort[] registers,
+        CancellationToken cancellationToken = default)
+    {
+        if (registers.Length == 0)
+            return;
+
+        if (_master == null || !IsConnected)
+            throw new InvalidOperationException("通道未连接");
+
+        await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            await Task.Run(
+                () => _master!.WriteMultipleRegisters(slaveId, startAddress, registers),
+                cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    public static ushort[] EncodeValue(object value, TagDataType dataType) =>
+        EncodeRegisters(value, dataType);
+
     private static object ParseRegisters(ushort[] registers, TagDataType dataType)
     {
         return dataType switch
