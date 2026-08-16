@@ -1,5 +1,8 @@
 # 架构与文件
 
+仓库：https://github.com/Jrfstudymsp430/FirstProject  
+下文路径相对 `src/ScadaApp/`。
+
 ## 解决方案
 
 - `ScadaApp.sln`
@@ -56,6 +59,7 @@ Helpers/        WindowWorkAreaHelper
 | ChannelConfigDialog | 通道参数 |
 | TagConfigDialog | 点表项（无从站地址） |
 | InputDialog | 写入值 |
+| BatchWriteDialog | 连续点批量写入 |
 | MessageDialog | 确认/提示 |
 | TagTrendWindow | 点位曲线（非模态，每点一窗） |
 

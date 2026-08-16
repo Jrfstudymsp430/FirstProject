@@ -1,15 +1,35 @@
 ---
 name: scada-app
-description: Use this skill for ANY work on FirstProject / ScadaApp — the WPF Modbus RTU SCADA HMI. Apply when the user mentions 通道, 串口, COM, 点表, 标签, 实时监视, 曲线, 写入, 功能码, Float CDAB, 布局, 主题, 配置, channels.json, 从机ID, 轮询, 日志, 标题栏, or just asks to change/fix/add something in this repo. This is the project playbook; use it even if they do not say SCADA or Modbus.
+description: "Use this skill for ScadaApp / FirstProject, the WPF Modbus RTU SCADA HMI, in ANY folder or new chat—not only this git repo. Apply when the user types /scada-app or mentions 通道, 串口, COM, 点表, 标签, 实时监视, 曲线, 写入, 功能码, Float CDAB, 布局, 主题, channels.json, 从机ID, 轮询, 日志, 标题栏, 收发包. This is the project playbook even if they do not say SCADA."
 ---
 
 # ScadaApp 项目手册
 
 用简体中文回复。先读本文件；改协议/配置/窗口/曲线时再按需打开 `references/`。
 
+本 Skill 可放在用户目录，任意 Cursor 对话都能 `/scada-app`。仓库里的 `.cursor/skills/scada-app/` 只对当前仓库自动带上。
+
+## 安装到其它地方（全局）
+
+把整个 `scada-app` 文件夹复制到本机 Cursor 用户 Skill 目录（文件夹名必须是 `scada-app`，且内含 `SKILL.md`）：
+
+- Windows：`%USERPROFILE%\.cursor\skills\scada-app\`
+- macOS / Linux：`~/.cursor/skills/scada-app/`
+
+复制后重启 Cursor 或新开对话，输入 `/scada-app`。也可在 Cursor **Settings → Rules, Skills** 里确认已出现。
+
+## 定位代码
+
+不要写死 `/workspace`。按下面顺序找仓库根：
+
+1. 当前工作区里有 `ScadaApp.sln` 或 `src/ScadaApp/ScadaApp.csproj`
+2. 否则打开 https://github.com/Jrfstudymsp430/FirstProject
+
+应用代码在仓库根下的 `src/ScadaApp/`。下文路径都相对这个目录。
+
 ## 产品
 
-Windows 上位机：多串口 Modbus RTU 采集。仓库根目录 `/workspace`，应用在 `src/ScadaApp/`。
+Windows 上位机：多串口 Modbus RTU 采集。
 
 - 框架：**WPF + .NET 9**（`net9.0-windows`），MVVM（CommunityToolkit.Mvvm）
 - 通信：NModbus RTU，一通道一口
@@ -19,8 +39,9 @@ Windows 上位机：多串口 Modbus RTU 采集。仓库根目录 `/workspace`�
 - 配置：与 exe 同目录 `channels.json`（Debug/Release/publish）。旧 `%AppData%\ScadaApp\channels.json` 可迁移
 - 连接成功后状态保持「已连接」；轮询失败只记日志，不清空状态栏/日志栏连接文案
 - 曲线：自绘 `TrendChart`，**禁止 LiveCharts / ScottPlot / OxyPlot**
+- 通道卡片和状态栏显示收发报文：请求 +1 发，应答 +1 收
 
-Linux Cloud Agent **编不了 WPF**，不要假装 `dotnet build` 已通过。Windows 上：
+Linux / Cloud Agent **编不了 WPF**，不要假装 `dotnet build` 已通过。Windows 上：
 
 ```bash
 dotnet run --project src/ScadaApp/ScadaApp.csproj
@@ -51,6 +72,7 @@ dotnet run --project src/ScadaApp/ScadaApp.csproj
 | 曲线绘制 | `Controls/TrendChart.cs` |
 | 曲线窗口 | `Views/TagTrendWindow.xaml(.cs)` |
 | 历史缓冲 | `Services/TrendBuffer.cs`, `TrendStore.cs` |
+| 批量写入 | `Views/BatchWriteDialog.xaml(.cs)`, `Services/TagBlockWriter.cs` |
 
 更细的文件说明见 [references/architecture.md](references/architecture.md)。已知坑见 [references/gotchas.md](references/gotchas.md)。
 
@@ -71,7 +93,7 @@ dotnet run --project src/ScadaApp/ScadaApp.csproj
 - `TagValue.NumericValue` 为缩放后的数值；曲线只记 `Quality == Good`。
 - `TrendStore` 按 tagId 复用缓冲，刷新点表不能丢历史。
 - 清空日志不得把「已连接」改成离线。
-- 通道卡片和状态栏显示收发报文数：每次 Modbus 请求 +1 发，收到应答 +1 收。超时/失败只计发。停止后保留本次计数，重新启动从 0 开始。
+- 单点写入：监视卡片「写入」（功能码 06/16）。批量写入：点表连选连续可写点，功能码 16 一次下发。
 
 ## 退出
 
