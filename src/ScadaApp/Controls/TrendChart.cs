@@ -497,7 +497,7 @@ public sealed class TrendChart : FrameworkElement
         }
 
         _hoverX = (int)pos.X;
-        _hoverText = $"{new DateTime(_ticks[best]):HH:mm:ss.fff}  {_values[best]:G6}";
+        _hoverText = $"{new DateTime(_ticks[best]):HH:mm:ss}  {_values[best]:G6}";
         InvalidateVisual();
     }
 
@@ -513,9 +513,9 @@ public sealed class TrendChart : FrameworkElement
     private static string FormatAxis(double value)
     {
         var abs = Math.Abs(value);
-        if (abs >= 1000) return value.ToString("0");
-        if (abs >= 10) return value.ToString("0.0");
-        if (abs >= 1) return value.ToString("0.00");
+        if (abs >= 1000) return value.ToString("0.000");
+        if (abs >= 10) return value.ToString("0.000");
+        if (abs >= 1) return value.ToString("0.000");
         return value.ToString("0.000");
     }
 
