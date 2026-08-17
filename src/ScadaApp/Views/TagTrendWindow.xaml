@@ -5,8 +5,8 @@
     xmlns:ctrl="clr-namespace:ScadaApp.Controls"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     Title="点位曲线"
-    Width="860"
-    Height="520"
+    Width="900"
+    Height="600"
     MinWidth="640"
     MinHeight="380"
     Background="{StaticResource BgDark}"
@@ -56,9 +56,7 @@
                         Foreground="{StaticResource TextPrimary}"
                         Text="点位曲线" />
                 </StackPanel>
-                <StackPanel
-                    HorizontalAlignment="Right"
-                    Orientation="Horizontal">
+                <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
                     <Button
                         Click="MaximizeButton_Click"
                         Style="{StaticResource WindowChromeButton}"
@@ -165,32 +163,39 @@
                         VerticalAlignment="Center"
                         Orientation="Horizontal">
                         <Button
+                            x:Name="PauseButton"
+                            Margin="0,0,12,0"
+                            Click="PauseButton_Click"
+                            Content="暂停刷新"
+                            Style="{StaticResource SecondaryButton}"
+                            ToolTip="暂停后曲线不再滚动，方便读数" />
+                        <Button
                             x:Name="Range1Button"
                             Margin="0,0,6,0"
                             Click="RangeButton_Click"
                             Content="1 分钟"
-                            Tag="60"
-                            Style="{StaticResource SecondaryButton}" />
+                            Style="{StaticResource SecondaryButton}"
+                            Tag="60" />
                         <Button
                             x:Name="Range5Button"
                             Margin="0,0,6,0"
                             Click="RangeButton_Click"
                             Content="5 分钟"
-                            Tag="300"
-                            Style="{StaticResource SecondaryButton}" />
+                            Style="{StaticResource SecondaryButton}"
+                            Tag="300" />
                         <Button
                             x:Name="Range15Button"
                             Margin="0,0,6,0"
                             Click="RangeButton_Click"
                             Content="15 分钟"
-                            Tag="900"
-                            Style="{StaticResource SecondaryButton}" />
+                            Style="{StaticResource SecondaryButton}"
+                            Tag="900" />
                         <Button
                             x:Name="RangeAllButton"
                             Click="RangeButton_Click"
                             Content="全部"
-                            Tag="0"
-                            Style="{StaticResource SuccessButton}" />
+                            Style="{StaticResource SuccessButton}"
+                            Tag="0" />
                     </StackPanel>
                 </Grid>
             </Border>

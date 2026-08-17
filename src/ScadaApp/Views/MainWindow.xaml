@@ -8,7 +8,7 @@
     Title="SCADA · Modbus RTU 多通道采集系统"
     Width="1120"
     Height="700"
-    MinWidth="900"
+    MinWidth="1000"
     MinHeight="560"
     Background="{StaticResource BgDark}"
     Closing="Window_Closing"

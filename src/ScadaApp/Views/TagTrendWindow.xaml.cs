@@ -86,6 +86,9 @@ public partial class TagTrendWindow : Window
 
     private void RefreshStats()
     {
+        if (Chart.Paused)
+            return;
+
         CurrentText.Text = _tag.DisplayValue;
         var window = Chart.WindowSeconds > 0
             ? TimeSpan.FromSeconds(Chart.WindowSeconds)
@@ -102,6 +105,24 @@ public partial class TagTrendWindow : Window
         MinText.Text = Format(min);
         MaxText.Text = Format(max);
         AvgText.Text = Format(avg);
+    }
+
+    private void PauseButton_Click(object sender, RoutedEventArgs e)
+    {
+        Chart.Paused = !Chart.Paused;
+        if (Chart.Paused)
+        {
+            PauseButton.Content = "继续刷新";
+            PauseButton.Style = (Style)FindResource("DangerButton");
+            _timer.Stop();
+        }
+        else
+        {
+            PauseButton.Content = "暂停刷新";
+            PauseButton.Style = (Style)FindResource("SecondaryButton");
+            _timer.Start();
+            RefreshStats();
+        }
     }
 
     private void RangeButton_Click(object sender, RoutedEventArgs e)

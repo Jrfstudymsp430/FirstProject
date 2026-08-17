@@ -69,6 +69,10 @@
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
         <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI, PingFang SC" />
         <Setter Property="FontSize" Value="13" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="TextOptions.TextFormattingMode" Value="Display" />
+        <Setter Property="TextOptions.TextRenderingMode" Value="ClearType" />
     </Style>
 
     <!--  自定义标题栏按钮  -->

@@ -28,6 +28,10 @@ public sealed class TrendChart : FrameworkElement
         nameof(LineBrush), typeof(Brush), typeof(TrendChart),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+    public static readonly DependencyProperty PausedProperty = DependencyProperty.Register(
+        nameof(Paused), typeof(bool), typeof(TrendChart),
+        new FrameworkPropertyMetadata(false, OnPausedChanged));
+
     public static readonly DependencyProperty ClickCommandProperty = DependencyProperty.Register(
         nameof(ClickCommand), typeof(ICommand), typeof(TrendChart));
 
@@ -44,7 +48,10 @@ public sealed class TrendChart : FrameworkElement
     private readonly double[] _colLast = new double[4096];
     private readonly bool[] _colHas = new bool[4096];
     private int _lastVersion = -1;
-    private int _hoverX = -1;
+    private int _count;
+    private bool _hovering;
+    private double _hoverValue;
+    private long _hoverTicks;
     private string? _hoverText;
 
     static TrendChart()
@@ -61,6 +68,10 @@ public sealed class TrendChart : FrameworkElement
                     continue;
                 }
 
+                if (chart.Paused)
+                    continue;
+
+                
                 var version = chart.Buffer?.Version ?? -1;
                 if (version != chart._lastVersion)
                     chart.InvalidateVisual();
@@ -94,9 +105,9 @@ public sealed class TrendChart : FrameworkElement
         MouseMove += OnMouseMove;
         MouseLeave += (_, _) =>
         {
-            if (_hoverX < 0)
+            if (!_hovering)
                 return;
-            _hoverX = -1;
+            _hovering = false;
             _hoverText = null;
             InvalidateVisual();
         };
@@ -124,6 +135,12 @@ public sealed class TrendChart : FrameworkElement
     {
         get => (Brush?)GetValue(LineBrushProperty);
         set => SetValue(LineBrushProperty, value);
+    }
+
+    public bool Paused
+    {
+        get => (bool)GetValue(PausedProperty);
+        set => SetValue(PausedProperty, value);
     }
 
     public ICommand? ClickCommand
@@ -157,9 +174,10 @@ public sealed class TrendChart : FrameworkElement
         if (width < 8 || height < 8)
             return;
 
-        var buffer = Buffer;
-        _lastVersion = buffer?.Version ?? -1;
-        var count = buffer?.CopyTo(_values, _ticks) ?? 0;
+        if (!Paused)
+            CaptureSnapshot();
+
+        var count = _count;
         if (count < 1)
         {
             DrawEmpty(dc, width, height);
@@ -259,8 +277,8 @@ public sealed class TrendChart : FrameworkElement
         var line = (LineBrush as SolidColorBrush)?.Color ?? Color.FromRgb(0x2E, 0xE6, 0xC0);
         DrawSeries(dc, plot, colCount, yMin, yMax, line, compact);
 
-        if (!compact && _hoverX >= 0)
-            DrawHover(dc, plot, colCount, tStart, tEnd, yMin, yMax, line);
+        if (!compact && _hovering)
+            DrawHover(dc, plot, tStart, tEnd, yMin, yMax, line);
     }
 
     private void DrawSeries(DrawingContext dc, Rect plot, int colCount, double yMin, double yMax, Color line, bool compact)
@@ -357,7 +375,7 @@ public sealed class TrendChart : FrameworkElement
 
         for (var i = 0; i <= 4; i++)
         {
-            var y = plot.Top + plot.Height * i / 4;
+            var y = PixelAlign(plot.Top + plot.Height * i / 4);
             if (i is > 0 and < 4)
                 dc.DrawLine(grid, new Point(plot.Left, y), new Point(plot.Right, y));
 
@@ -376,7 +394,7 @@ public sealed class TrendChart : FrameworkElement
 
         for (var i = 0; i <= 4; i++)
         {
-            var x = plot.Left + plot.Width * i / 4;
+            var x = PixelAlign(plot.Left + plot.Width * i / 4);
             if (i is > 0 and < 4)
                 dc.DrawLine(grid, new Point(x, plot.Top), new Point(x, plot.Bottom));
 
@@ -397,20 +415,33 @@ public sealed class TrendChart : FrameworkElement
     private void DrawHover(
         DrawingContext dc,
         Rect plot,
-        int colCount,
         long tStart,
         long tEnd,
         double yMin,
         double yMax,
         Color line)
     {
-        if (_hoverX < plot.Left || _hoverX > plot.Right)
-            return;
+        var pt = ValueToPoint(plot, tStart, tEnd, _hoverTicks, _hoverValue, yMin, yMax);
+        var x = PixelAlign(pt.X);
+        var y = PixelAlign(pt.Y);
 
-        var pen = new Pen(new SolidColorBrush(Color.FromArgb(0xAA, 0x4E, 0xC9, 0xF5)), 1);
-        pen.Brush.Freeze();
-        pen.Freeze();
-        dc.DrawLine(pen, new Point(_hoverX, plot.Top), new Point(_hoverX, plot.Bottom));
+        var dash = new DashStyle(new DoubleCollection { 4, 3 }, 0);
+        dash.Freeze();
+        var crossPen = new Pen(new SolidColorBrush(Color.FromArgb(0xCC, 0x4E, 0xC9, 0xF5)), 1)
+        {
+            DashStyle = dash
+        };
+        crossPen.Brush.Freeze();
+        crossPen.Freeze();
+
+        dc.DrawLine(crossPen, new Point(x, plot.Top), new Point(x, plot.Bottom));
+        dc.DrawLine(crossPen, new Point(plot.Left, y), new Point(plot.Right, y));
+
+        var markerFill = new SolidColorBrush(line);
+        markerFill.Freeze();
+        var markerPen = new Pen(Brushes.White, 1);
+        markerPen.Freeze();
+        dc.DrawEllipse(markerFill, markerPen, new Point(x, y), 3.5, 3.5);
 
         if (string.IsNullOrEmpty(_hoverText))
             return;
@@ -424,14 +455,24 @@ public sealed class TrendChart : FrameworkElement
             12,
             Brushes.White,
             dip);
-        var box = new Rect(
-            Math.Min(_hoverX + 8, plot.Right - ft.Width - 12),
-            plot.Top + 6,
-            ft.Width + 12,
-            ft.Height + 8);
-        dc.DrawRectangle(new SolidColorBrush(Color.FromArgb(0xCC, 0x1E, 0x2B, 0x3E)),
-            new Pen(new SolidColorBrush(line), 1), box);
-        dc.DrawText(ft, new Point(box.X + 6, box.Y + 4));
+        var boxW = ft.Width + 12;
+        var boxH = ft.Height + 8;
+        var boxX = x + 10;
+        if (boxX + boxW > plot.Right - 2)
+            boxX = x - boxW - 10;
+        var boxY = y - boxH - 8;
+        if (boxY < plot.Top + 2)
+            boxY = y + 10;
+        if (boxY + boxH > plot.Bottom - 2)
+            boxY = plot.Bottom - boxH - 2;
+
+        var boxBrush = new SolidColorBrush(Color.FromArgb(0xCC, 0x1E, 0x2B, 0x3E));
+        boxBrush.Freeze();
+        var boxPen = new Pen(new SolidColorBrush(line), 1);
+        boxPen.Brush.Freeze();
+        boxPen.Freeze();
+        dc.DrawRectangle(boxBrush, boxPen, new Rect(boxX, boxY, boxW, boxH));
+        dc.DrawText(ft, new Point(boxX + 6, boxY + 4));
     }
 
     private void DrawEmpty(DrawingContext dc, int width, int height)
@@ -462,17 +503,16 @@ public sealed class TrendChart : FrameworkElement
         var plotW = Math.Max(4, ActualWidth - padL - padR);
         if (pos.X < padL || pos.X > padL + plotW)
         {
-            if (_hoverX >= 0)
+            if (_hovering)
             {
-                _hoverX = -1;
+                _hovering = false;
                 _hoverText = null;
                 InvalidateVisual();
             }
             return;
         }
 
-        var buffer = Buffer;
-        var count = buffer?.CopyTo(_values, _ticks) ?? 0;
+        var count = Paused ? _count : Buffer?.CopyTo(_values, _ticks) ?? 0;
         if (count < 1)
             return;
 
@@ -496,9 +536,33 @@ public sealed class TrendChart : FrameworkElement
             }
         }
 
-        _hoverX = (int)pos.X;
+        _hovering = true;
+        _hoverTicks = _ticks[best];
+        _hoverValue = _values[best];
         _hoverText = $"{new DateTime(_ticks[best]):HH:mm:ss}  {_values[best]:G6}";
         InvalidateVisual();
+    }
+
+    private double PixelAlign(double value)
+    {
+        var ppd = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+        if (ppd <= 0)
+            ppd = 1;
+        return (Math.Round(value * ppd) + 0.5) / ppd;
+    }
+
+    private static Point ValueToPoint(Rect plot, long tStart, long tEnd, long ticks, double value, double yMin, double yMax)
+    {
+        var span = (double)(tEnd - tStart);
+        if (span <= 0)
+            span = 1;
+        var x = plot.Left + (ticks - tStart) / span * plot.Width;
+        var y = plot.Bottom - (value - yMin) / (yMax - yMin) * plot.Height;
+        if (x < plot.Left) x = plot.Left;
+        if (x > plot.Right) x = plot.Right;
+        if (y < plot.Top) y = plot.Top;
+        if (y > plot.Bottom) y = plot.Bottom;
+        return new Point(x, y);
     }
 
     private static Point ToPoint(Rect plot, int col, int colCount, double value, double yMin, double yMax)
@@ -519,9 +583,28 @@ public sealed class TrendChart : FrameworkElement
         return value.ToString("0.000");
     }
 
+    private void CaptureSnapshot()
+    {
+        var buffer = Buffer;
+        _lastVersion = buffer?.Version ?? -1;
+        _count = buffer?.CopyTo(_values, _ticks) ?? 0;
+    }
+
+    private static void OnPausedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is not TrendChart chart)
+            return;
+        if (chart.Paused)
+            chart.CaptureSnapshot();
+        chart.InvalidateVisual();
+    }
+
     private static void OnWatchPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        if (d is TrendChart chart)
-            chart.InvalidateVisual();
+        if (d is not TrendChart chart)
+            return;
+        if (chart.Paused && e.Property == BufferProperty)
+            chart.CaptureSnapshot();
+        chart.InvalidateVisual();
     }
 }
