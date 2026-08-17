@@ -699,9 +699,12 @@
                                         Margin="0,0,10,0"
                                         Background="{StaticResource AccentBarBrush}"
                                         CornerRadius="2" />
-                                    <TextBlock Style="{StaticResource SectionTitle}" Text="通信日志" />
+                                    <TextBlock
+                                        VerticalAlignment="Center"
+                                        Style="{StaticResource SectionTitle}"
+                                        Text="通信日志" />
                                     <Border
-                                        Margin="12,0,0,0"
+                                        Margin="12,1,0,0"
                                         Padding="8,2"
                                         VerticalAlignment="Center"
                                         Background="{Binding SelectedChannel.State, Converter={StaticResource ChannelStateToBadgeBrush}}"
@@ -715,6 +718,7 @@
                                 <Button
                                     Padding="10,4"
                                     HorizontalAlignment="Right"
+                                    VerticalAlignment="Center"
                                     Command="{Binding ClearLogsCommand}"
                                     Content="清空日志"
                                     Style="{StaticResource SecondaryButton}" />

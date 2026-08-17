@@ -105,7 +105,7 @@ public partial class MainViewModel : ObservableObject
         await _channelManager.RemoveChannelAsync(SelectedChannel.Id);
         ConfigStorage.Save(_channelManager.Channels);
         LoadChannels();
-        SelectedChannel = Channels.FirstOrDefault();
+        SelectedChannel = Channels.LastOrDefault();
         StatusText = $"已删除通道: {name}";
     }
 
