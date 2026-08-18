@@ -38,8 +38,15 @@ public partial class TagItemViewModel : ObservableObject
         _ => _tag.FunctionCode.ToString()
     };
     public ushort Address => _tag.Address;
-    public string DataType => _tag.DataType == TagDataType.Float32 ? "Float CDAB" : "UInt16";
+    public string DataType => _tag.DataType switch
+    {
+        TagDataType.Float32 => "Float CDAB",
+        TagDataType.Double64 => "Double GHEF CDAB",
+        _ => "UInt16"
+    };
     public string Unit => _tag.Unit;
+    public int DecimalPlaces => _tag.DecimalPlaces;
+    public bool TrendEnabled => _tag.TrendEnabled;
     public bool IsWritable => _tag.IsWritable;
     public string ChannelName => _channel.Name;
     public string ChannelId => _channel.Id;
@@ -54,7 +61,7 @@ public partial class TagItemViewModel : ObservableObject
         ErrorMessage = value.ErrorMessage;
         NumericValue = value.NumericValue;
 
-        if (recordTrend && value.Quality == "Good" && value.NumericValue is double number)
+        if (recordTrend && TrendEnabled && value.Quality == "Good" && value.NumericValue is double number)
             Trend.Add(value.Timestamp == default ? DateTime.Now : value.Timestamp, number);
     }
 
@@ -65,6 +72,7 @@ public partial class TagItemViewModel : ObservableObject
         {
             TagDataType.UInt16 => ushort.Parse(input, CultureInfo.InvariantCulture),
             TagDataType.Float32 => float.Parse(input, CultureInfo.InvariantCulture),
+            TagDataType.Double64 => double.Parse(input, CultureInfo.InvariantCulture),
             _ => input
         };
 

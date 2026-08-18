@@ -28,6 +28,7 @@ public partial class MainViewModel : ObservableObject
     private readonly DispatcherTimer _clock = new() { Interval = TimeSpan.FromSeconds(1) };
 
     public ObservableCollection<ChannelItemViewModel> Channels { get; } = new();
+    public ObservableCollection<TagItemViewModel> MonitorTags { get; } = new();
     public ObservableCollection<TagItemViewModel> Tags { get; } = new();
     public ObservableCollection<LogItemViewModel> Logs { get; } = new();
     public ObservableCollection<string> AvailablePorts { get; } = new();
@@ -57,7 +58,7 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnSelectedChannelChanged(ChannelItemViewModel? value)
     {
-        LoadTagsForChannel(value);
+        LoadConfigTags(value);
         RefreshSummary();
     }
 
@@ -194,7 +195,7 @@ public partial class MainViewModel : ObservableObject
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
         SelectedChannel.RefreshState();
-        LoadTagsForChannel(SelectedChannel);
+        ReloadAllTags();
         StatusText = $"已更新通道参数: {SelectedChannel.Name}";
     }
 
@@ -218,7 +219,7 @@ public partial class MainViewModel : ObservableObject
         SelectedChannel.Config.Tags.Add(tag);
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
-        LoadTagsForChannel(SelectedChannel);
+        ReloadAllTags();
         StatusText = $"已添加标签: {tag.Name}";
     }
 
@@ -235,7 +236,7 @@ public partial class MainViewModel : ObservableObject
 
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
-        LoadTagsForChannel(SelectedChannel);
+        ReloadAllTags();
         StatusText = $"已更新标签: {tag.Name}";
     }
 
@@ -252,7 +253,7 @@ public partial class MainViewModel : ObservableObject
         TagTrendWindow.CloseIfOpen(tag.TagId);
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
-        LoadTagsForChannel(SelectedChannel);
+        ReloadAllTags();
         StatusText = $"已删除标签: {tag.Name}";
     }
 
@@ -364,7 +365,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ShowTagTrend(TagItemViewModel? tag)
     {
-        if (tag == null) return;
+        if (tag == null || !tag.TrendEnabled)
+            return;
         TagTrendWindow.Show(tag, Application.Current.MainWindow);
         StatusText = $"已打开曲线: {tag.Name}";
     }
@@ -392,44 +394,77 @@ public partial class MainViewModel : ObservableObject
             Channels.Add(vm);
         }
 
+        RebuildMonitorTags();
         SelectedChannel = Channels.FirstOrDefault(c => c.Id == selectedId) ?? Channels.FirstOrDefault();
+        LoadConfigTags(SelectedChannel);
+        SyncTrendWindows();
         RefreshSummary();
         ApplyConnectedStatusText();
     }
 
-    private void LoadTagsForChannel(ChannelItemViewModel? channel)
+    private void ReloadAllTags()
+    {
+        RebuildMonitorTags();
+        LoadConfigTags(SelectedChannel);
+        SyncTrendWindows();
+        RefreshSummary();
+    }
+
+    private void SyncTrendWindows()
+    {
+        foreach (var tag in MonitorTags.Where(t => !t.TrendEnabled))
+            TagTrendWindow.CloseIfOpen(tag.TagId);
+        TagTrendWindow.RebindAll(MonitorTags.Where(t => t.TrendEnabled));
+    }
+
+    private void RebuildMonitorTags()
+    {
+        MonitorTags.Clear();
+        foreach (var channel in Channels)
+            channel.MonitorTags.Clear();
+
+        foreach (var channel in Channels)
+        {
+            foreach (var tag in channel.Config.Tags)
+            {
+                var vm = new TagItemViewModel(_channelManager, channel.Config, tag, _trends.GetOrCreate(tag.Id));
+                var running = _channelManager.GetRunningChannel(channel.Id);
+                if (running?.TagValues.TryGetValue(tag.Id, out var value) == true && value != null)
+                    vm.Update(value, recordTrend: false);
+                MonitorTags.Add(vm);
+                channel.MonitorTags.Add(vm);
+            }
+
+            channel.RefreshState();
+        }
+    }
+
+    private void LoadConfigTags(ChannelItemViewModel? channel)
     {
         Tags.Clear();
         if (channel == null)
-        {
-            RefreshSummary();
             return;
-        }
 
-        foreach (var tag in channel.Config.Tags)
-        {
-            var vm = new TagItemViewModel(_channelManager, channel.Config, tag, _trends.GetOrCreate(tag.Id));
-            var running = _channelManager.GetRunningChannel(channel.Id);
-            if (running?.TagValues.TryGetValue(tag.Id, out var value) == true && value != null)
-                vm.Update(value, recordTrend: false);
-            Tags.Add(vm);
-        }
-        TagTrendWindow.RebindAll(Tags);
-        RefreshSummary();
+        foreach (var tag in MonitorTags.Where(t => t.ChannelId == channel.Id))
+            Tags.Add(tag);
     }
 
     private void UpdateTagValue(TagValue value)
     {
-        var tag = Tags.FirstOrDefault(t => t.TagId == value.TagId);
+        var tag = MonitorTags.FirstOrDefault(t => t.TagId == value.TagId);
         if (tag != null)
         {
             tag.Update(value);
         }
         else if (value.Quality == "Good" && value.NumericValue is double number)
         {
-            _trends.GetOrCreate(value.TagId).Add(
-                value.Timestamp == default ? DateTime.Now : value.Timestamp,
-                number);
+            var point = Channels.SelectMany(c => c.Config.Tags).FirstOrDefault(t => t.Id == value.TagId);
+            if (point is { TrendEnabled: true })
+            {
+                _trends.GetOrCreate(value.TagId).Add(
+                    value.Timestamp == default ? DateTime.Now : value.Timestamp,
+                    number);
+            }
         }
 
         var channel = Channels.FirstOrDefault(c =>
@@ -449,8 +484,8 @@ public partial class MainViewModel : ObservableObject
     {
         ChannelCount = Channels.Count;
         RunningChannelCount = Channels.Count(c => c.IsRunning);
-        TagCount = Tags.Count;
-        GoodTagCount = Tags.Count(t => t.Quality == "Good");
+        TagCount = MonitorTags.Count;
+        GoodTagCount = MonitorTags.Count(t => t.Quality == "Good");
     }
 
     private void RefreshAllChannelStates()

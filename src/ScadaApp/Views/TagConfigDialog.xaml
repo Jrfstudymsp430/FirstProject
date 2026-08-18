@@ -39,44 +39,41 @@
             </StackPanel>
 
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" MinWidth="88" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
                 <TextBlock
                     Grid.Row="0"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="名称" />
                 <TextBox
                     Grid.Row="0"
                     Grid.Column="1"
-                    Margin="0,0,0,10"
-                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
                     Grid.Row="1"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="功能码" />
                 <ComboBox
                     x:Name="FunctionCodeCombo"
                     Grid.Row="1"
                     Grid.Column="1"
-                    Margin="0,0,0,10"
+                    VerticalAlignment="Center"
                     SelectedItem="{Binding FunctionCode}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -87,28 +84,23 @@
 
                 <TextBlock
                     Grid.Row="2"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="寄存器地址" />
                 <TextBox
                     Grid.Row="2"
                     Grid.Column="1"
-                    Margin="0,0,0,10"
-                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
                     Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
                     Grid.Row="3"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="数据类型" />
                 <ComboBox
                     x:Name="DataTypeCombo"
                     Grid.Row="3"
                     Grid.Column="1"
-                    Margin="0,0,0,10"
+                    VerticalAlignment="Center"
                     SelectedItem="{Binding DataType}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
@@ -119,50 +111,71 @@
 
                 <TextBlock
                     Grid.Row="4"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="单位" />
                 <TextBox
                     Grid.Row="4"
                     Grid.Column="1"
-                    Margin="0,0,0,10"
-                    Padding="3,0,0,0"
+                    VerticalAlignment="Center"
                     Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
                 <TextBlock
                     Grid.Row="5"
-                    Grid.Column="0"
-                    VerticalAlignment="Center"
-                    Style="{StaticResource FieldLabel}"
+                    Style="{StaticResource DialogFieldLabel}"
                     Text="比例 / 偏移" />
-                <StackPanel
-                    Grid.Row="5"
-                    Grid.Column="1"
-                    Margin="0,0,0,10"
-                    Orientation="Horizontal">
+                <Grid Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
                     <TextBox
-                        Width="90"
+                        Grid.Column="0"
                         Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTip="Scale" />
+                        ToolTip="比例 Scale" />
                     <TextBlock
-                        Margin="4,0"
+                        Grid.Column="1"
+                        Margin="8,0"
                         VerticalAlignment="Center"
                         Foreground="{StaticResource TextSecondary}"
-                        Text=" / " />
+                        Text="/" />
                     <TextBox
-                        Width="90"
+                        Grid.Column="2"
                         Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}"
-                        ToolTip="Offset" />
-                </StackPanel>
+                        ToolTip="偏移 Offset" />
+                </Grid>
 
                 <TextBlock
                     Grid.Row="6"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="小数位数" />
+                <ComboBox
+                    x:Name="DecimalPlacesCombo"
+                    Grid.Row="6"
                     Grid.Column="1"
-                    Margin="0,0,0,20"
+                    VerticalAlignment="Center"
+                    SelectedItem="{Binding DecimalPlaces}" />
+
+                <TextBlock
+                    Grid.Row="7"
+                    Style="{StaticResource DialogFieldLabel}"
+                    Text="曲线" />
+                <CheckBox
+                    Grid.Row="7"
+                    Grid.Column="1"
+                    VerticalAlignment="Center"
+                    Content="启用曲线"
+                    IsChecked="{Binding TrendEnabled}" />
+
+                <TextBlock
+                    Grid.Row="8"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="2"
+                    Margin="0,8,0,16"
                     FontSize="11"
                     Foreground="{StaticResource TextSecondary}"
-                    Text="从机ID在通道参数中设置；03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB）" />
+                    Text="从机ID在通道参数中设置；03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB / Double GHEF CDAB）"
+                    TextWrapping="Wrap" />
             </Grid>
 
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">

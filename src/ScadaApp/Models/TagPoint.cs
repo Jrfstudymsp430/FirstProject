@@ -1,7 +1,7 @@
 namespace ScadaApp.Models;
 
 /// <summary>
-/// SCADA 数据点。采集一律用 03；06/16 表示可写。Float32 采用 CDAB 字序。
+/// SCADA 数据点。采集一律用 03；06/16 表示可写。Float32 为 CDAB，Double64 为 GHEF CDAB。
 /// </summary>
 public class TagPoint
 {
@@ -14,10 +14,17 @@ public class TagPoint
     public string Unit { get; set; } = string.Empty;
     public double Scale { get; set; } = 1.0;
     public double Offset { get; set; }
+    public int DecimalPlaces { get; set; } = 2;
+    public bool TrendEnabled { get; set; } = true;
     public bool IsEnabled { get; set; } = true;
 
     public bool IsWritable => FunctionCode is ModbusFunctionCode.WriteSingleRegister
         or ModbusFunctionCode.WriteMultipleRegisters;
 
-    public ushort RegisterCount => DataType == TagDataType.Float32 ? (ushort)2 : (ushort)1;
+    public ushort RegisterCount => DataType switch
+    {
+        TagDataType.Float32 => 2,
+        TagDataType.Double64 => 4,
+        _ => 1
+    };
 }

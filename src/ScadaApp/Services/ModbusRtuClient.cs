@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.IO.Ports;
 using NModbus;
 using NModbus.Serial;
@@ -214,6 +215,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         {
             TagDataType.UInt16 => registers[0],
             TagDataType.Float32 => RegistersToFloatCdab(registers),
+            TagDataType.Double64 => RegistersToDoubleGhefCdab(registers),
             _ => registers[0]
         };
     }
@@ -223,6 +225,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         return dataType switch
         {
             TagDataType.Float32 => FloatToRegistersCdab(Convert.ToSingle(value)),
+            TagDataType.Double64 => DoubleToRegistersGhefCdab(Convert.ToDouble(value)),
             _ => new[] { Convert.ToUInt16(value) }
         };
     }
@@ -255,17 +258,72 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         return new[] { cd, ab };
     }
 
+    /// <summary>
+    /// GHEF CDAB：四个寄存器依次为 GH、EF、CD、AB（64 位字序全反转，对应 32 位的 CDAB）。
+    /// </summary>
+    private static double RegistersToDoubleGhefCdab(ushort[] registers)
+    {
+        var bytes = new[]
+        {
+            (byte)(registers[3] >> 8),
+            (byte)(registers[3] & 0xFF),
+            (byte)(registers[2] >> 8),
+            (byte)(registers[2] & 0xFF),
+            (byte)(registers[1] >> 8),
+            (byte)(registers[1] & 0xFF),
+            (byte)(registers[0] >> 8),
+            (byte)(registers[0] & 0xFF)
+        };
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+        return BitConverter.ToDouble(bytes, 0);
+    }
+
+    private static ushort[] DoubleToRegistersGhefCdab(double value)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+
+        var ab = (ushort)((bytes[0] << 8) | bytes[1]);
+        var cd = (ushort)((bytes[2] << 8) | bytes[3]);
+        var ef = (ushort)((bytes[4] << 8) | bytes[5]);
+        var gh = (ushort)((bytes[6] << 8) | bytes[7]);
+        return new[] { gh, ef, cd, ab };
+    }
+
     private static string FormatValue(object raw, TagPoint tag)
     {
         var scaled = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
-        if (string.IsNullOrEmpty(tag.Unit))
-        {
-            if (Math.Abs(tag.Scale - 1.0) < 1e-9 && Math.Abs(tag.Offset) < 1e-9)
-                return raw is IFormattable f ? f.ToString("G", null) ?? scaled.ToString("G") : scaled.ToString("G");
-            return scaled.ToString("G");
-        }
+        var number = tag.DataType == TagDataType.Double64
+            ? FormatScientific(scaled, tag.DecimalPlaces)
+            : FormatNumber(scaled, tag.DecimalPlaces);
+        return string.IsNullOrEmpty(tag.Unit) ? number : $"{number} {tag.Unit}";
+    }
 
-        return $"{scaled:F2} {tag.Unit}";
+    private static string FormatScientific(double value, int places)
+    {
+        places = Math.Clamp(places, 0, 12);
+        return value.ToString("E" + places, CultureInfo.CurrentCulture);
+    }
+
+    private static string FormatNumber(double value, int places)
+    {
+        var culture = CultureInfo.CurrentCulture;
+        places = Math.Clamp(places, 0, 12);
+        var number = value.ToString("F" + places, culture);
+        if (value == 0)
+            return number;
+
+        if (!double.TryParse(number, NumberStyles.Float, culture, out var shown) || shown != 0)
+            return number;
+
+        var digits = (int)Math.Ceiling(-Math.Log10(Math.Abs(value))) + 1;
+        digits = Math.Clamp(Math.Max(places, digits), 1, 12);
+        number = value.ToString("F" + digits, culture);
+        if (double.TryParse(number, NumberStyles.Float, culture, out shown) && shown == 0)
+            return value.ToString("G6", culture);
+        return number;
     }
 
     public void Dispose()

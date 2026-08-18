@@ -147,6 +147,7 @@ public class DataTypeToTextConverter : IValueConverter
             {
                 TagDataType.UInt16 => "UInt16",
                 TagDataType.Float32 => "Float CDAB",
+                TagDataType.Double64 => "Double GHEF CDAB",
                 _ => type.ToString()
             };
         }

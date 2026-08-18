@@ -135,6 +135,8 @@ public static class ConfigStorage
                 tag.Name = TrimOrEmpty(tag.Name);
                 tag.Unit = TrimOrEmpty(tag.Unit);
                 tag.SlaveId = channel.SlaveId;
+                if (tag.DecimalPlaces is < 0 or > 12)
+                    tag.DecimalPlaces = 2;
                 if (!Enum.IsDefined(tag.FunctionCode))
                     tag.FunctionCode = ModbusFunctionCode.ReadHoldingRegisters;
                 if (!Enum.IsDefined(tag.DataType))

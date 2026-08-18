@@ -3,5 +3,6 @@ namespace ScadaApp.Models;
 public enum TagDataType
 {
     UInt16,
-    Float32
+    Float32,
+    Double64
 }

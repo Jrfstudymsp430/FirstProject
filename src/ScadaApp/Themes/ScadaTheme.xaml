@@ -206,15 +206,15 @@
         <Setter Property="Margin" Value="0,0,14,0" />
     </Style>
 
-    <!--  实时监视数值卡片  -->
+    <!--  实时监视数值卡片：小卡片换行，不含迷你曲线  -->
     <Style x:Key="DataMonitorCard" TargetType="Border">
         <Setter Property="Background" Value="{StaticResource BgCard}" />
         <Setter Property="BorderBrush" Value="{StaticResource BorderColor}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CornerRadius" Value="10" />
-        <Setter Property="Padding" Value="14,12" />
-        <Setter Property="Width" Value="248" />
-        <Setter Property="Margin" Value="0,0,12,12" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Width" Value="186" />
+        <Setter Property="Margin" Value="0,0,8,8" />
     </Style>
 
     <!--  统计卡片  -->

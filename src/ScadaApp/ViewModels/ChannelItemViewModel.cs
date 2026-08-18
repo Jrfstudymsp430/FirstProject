@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ScadaApp.Models;
 using ScadaApp.Services;
@@ -30,6 +31,7 @@ public partial class ChannelItemViewModel : ObservableObject
     }
 
     public ChannelConfig Config { get; }
+    public ObservableCollection<TagItemViewModel> MonitorTags { get; } = new();
 
     public string Id => Config.Id;
     public string Name => Config.Name;
@@ -57,5 +59,6 @@ public partial class ChannelItemViewModel : ObservableObject
         }
         OnPropertyChanged(nameof(Summary));
         OnPropertyChanged(nameof(PacketStats));
+        OnPropertyChanged(nameof(TagCount));
     }
 }
