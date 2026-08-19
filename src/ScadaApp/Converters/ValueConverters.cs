@@ -116,6 +116,28 @@ public class BoolToHiddenVisibilityConverter : IValueConverter
         value is Visibility v && v == Visibility.Visible;
 }
 
+public class BoolToGridLengthConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is not true)
+            return new GridLength(0);
+
+        var spec = parameter?.ToString()?.Trim() ?? "*";
+        if (spec.EndsWith('*'))
+        {
+            var starText = spec.TrimEnd('*');
+            var star = string.IsNullOrEmpty(starText) ? 1d : double.Parse(starText, CultureInfo.InvariantCulture);
+            return new GridLength(star, GridUnitType.Star);
+        }
+
+        return new GridLength(double.Parse(spec, CultureInfo.InvariantCulture));
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
 public class FunctionCodeToTextConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

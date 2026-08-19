@@ -355,7 +355,7 @@
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" MinWidth="140" />
-                            <ColumnDefinition Width="16" />
+                            <ColumnDefinition Width="12" />
                             <ColumnDefinition Width="8*" MinWidth="520" />
                         </Grid.ColumnDefinitions>
 
@@ -476,41 +476,57 @@
                         <!--  右侧：实时监视（上）+ 点表配置（下）  -->
                         <Grid Grid.Column="2">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="1.6*" MinHeight="200" />
-                                <RowDefinition Height="8" />
-                                <RowDefinition Height="0.8*" MinHeight="150" />
+                                <RowDefinition Height="*" MinHeight="200" />
+                                <RowDefinition Height="{Binding IsTagTableVisible, Converter={StaticResource BoolToGridLength}, ConverterParameter=8}" />
+                                <RowDefinition Height="{Binding IsTagTableVisible, Converter={StaticResource BoolToGridLength}, ConverterParameter=0.8*}" />
                             </Grid.RowDefinitions>
 
                             <Border Grid.Row="0" Style="{StaticResource PanelCard}">
                                 <DockPanel>
-                                    <StackPanel
-                                        Margin="0,0,0,12"
-                                        DockPanel.Dock="Top"
-                                        Orientation="Horizontal">
-                                        <Border
-                                            Width="3"
-                                            Height="16"
-                                            Margin="0,0,10,0"
-                                            Background="{StaticResource AccentBarBrush}"
-                                            CornerRadius="2" />
-                                        <TextBlock Style="{StaticResource SectionTitle}" Text="实时监视" />
-                                        <TextBlock
-                                            Margin="10,0,0,0"
-                                            VerticalAlignment="Center"
-                                            FontSize="12"
-                                            Foreground="{StaticResource TextSecondary}"
-                                            Text="全部通道" />
-                                        <Border
-                                            Margin="12,0,0,0"
-                                            Padding="8,3"
-                                            Background="#2200B4D8"
-                                            CornerRadius="10">
+                                    <Grid Margin="0,0,0,12" DockPanel.Dock="Top">
+                                        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                                            <Border
+                                                Width="3"
+                                                Height="16"
+                                                Margin="0,0,10,0"
+                                                Background="{StaticResource AccentBarBrush}"
+                                                CornerRadius="2" />
+                                            <TextBlock Style="{StaticResource SectionTitle}" Text="实时监视" />
                                             <TextBlock
-                                                FontSize="11"
-                                                Foreground="{StaticResource AccentBlue}"
-                                                Text="{Binding TagCount, StringFormat={}{0} 点}" />
-                                        </Border>
-                                    </StackPanel>
+                                                Margin="10,0,0,0"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                Foreground="{StaticResource TextSecondary}"
+                                                Text="全部通道" />
+                                            <Border
+                                                Margin="12,0,0,0"
+                                                Padding="8,3"
+                                                Background="#2200B4D8"
+                                                CornerRadius="10">
+                                                <TextBlock
+                                                    FontSize="11"
+                                                    Foreground="{StaticResource AccentBlue}"
+                                                    Text="{Binding TagCount, StringFormat={}{0} 点}" />
+                                            </Border>
+                                        </StackPanel>
+                                        <Button
+                                            HorizontalAlignment="Right"
+                                            Command="{Binding ToggleTagTableCommand}"
+                                            Content="点表配置">
+                                            <Button.Style>
+                                                <Style BasedOn="{StaticResource SecondaryButton}" TargetType="Button">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsTagTableVisible}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource AccentGradientBrush}" />
+                                                            <Setter Property="Foreground" Value="#0A0E17" />
+                                                            <Setter Property="BorderThickness" Value="0" />
+                                                            <Setter Property="FontWeight" Value="SemiBold" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </Grid>
                                     <Grid>
                                         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <ItemsControl ItemsSource="{Binding Channels}">
@@ -563,7 +579,7 @@
                                             VerticalAlignment="Center"
                                             FontSize="13"
                                             Foreground="{StaticResource TextSecondary}"
-                                            Text="暂无实时数据，请在下方点表配置中添加标签">
+                                            Text="暂无实时数据，请打开点表配置添加标签">
                                             <TextBlock.Style>
                                                 <Style TargetType="TextBlock">
                                                     <Setter Property="Visibility" Value="Collapsed" />
@@ -587,9 +603,13 @@
                                 Background="Transparent"
                                 Cursor="SizeNS"
                                 ResizeDirection="Rows"
-                                ShowsPreview="False" />
+                                ShowsPreview="False"
+                                Visibility="{Binding IsTagTableVisible, Converter={StaticResource BoolToVis}}" />
 
-                            <Border Grid.Row="2" Style="{StaticResource PanelCard}">
+                            <Border
+                                Grid.Row="2"
+                                Style="{StaticResource PanelCard}"
+                                Visibility="{Binding IsTagTableVisible, Converter={StaticResource BoolToVis}}">
                                 <DockPanel>
                                     <Grid Margin="0,0,0,10" DockPanel.Dock="Top">
                                         <StackPanel VerticalAlignment="Center" Orientation="Horizontal">

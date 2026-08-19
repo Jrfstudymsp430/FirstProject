@@ -82,59 +82,91 @@ public sealed class ModbusRtuClient : IModbusRtuClient
 
     public async Task<TagValue> ReadTagAsync(TagPoint tag, CancellationToken cancellationToken = default)
     {
+        var values = await ReadTagsAsync(new[] { tag }, cancellationToken).ConfigureAwait(false);
+        return values[0];
+    }
+
+    public async Task<IReadOnlyList<TagValue>> ReadTagsAsync(
+        IReadOnlyList<TagPoint> tags,
+        CancellationToken cancellationToken = default)
+    {
+        if (tags.Count == 0)
+            return Array.Empty<TagValue>();
+
+        if (_master == null || !IsConnected)
+        {
+            return tags.Select(t => FailedValue(t, "通道未连接")).ToList();
+        }
+
+        await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try
+        {
+            var results = new List<TagValue>(tags.Count);
+            foreach (var block in TagBlockReader.Split(tags))
+            {
+                Interlocked.Increment(ref _txCount);
+                ushort[] registers;
+                try
+                {
+                    var count = block.Count;
+                    var start = block.Start;
+                    registers = await Task.Run(
+                        () => _master!.ReadHoldingRegisters(block.SlaveId, start, count),
+                        cancellationToken).ConfigureAwait(false);
+                    Interlocked.Increment(ref _rxCount);
+                }
+                catch (Exception ex)
+                {
+                    foreach (var tag in block.Tags)
+                        results.Add(FailedValue(tag, ex.Message));
+                    continue;
+                }
+
+                foreach (var tag in block.Tags)
+                    results.Add(DecodeFromBlock(tag, registers, block.Start));
+            }
+
+            return results;
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
+    private static TagValue FailedValue(TagPoint tag, string error) => new()
+    {
+        TagId = tag.Id,
+        Timestamp = DateTime.Now,
+        Quality = "Bad",
+        DisplayValue = "ERR",
+        ErrorMessage = error
+    };
+
+    private static TagValue DecodeFromBlock(TagPoint tag, ushort[] registers, ushort blockStart)
+    {
         var result = new TagValue
         {
             TagId = tag.Id,
             Timestamp = DateTime.Now
         };
 
-        if (_master == null || !IsConnected)
+        var offset = tag.Address - blockStart;
+        if (offset < 0 || offset + tag.RegisterCount > registers.Length)
         {
             result.Quality = "Bad";
-            result.ErrorMessage = "通道未连接";
+            result.ErrorMessage = "块读取范围不足";
+            result.DisplayValue = "ERR";
             return result;
         }
 
-        await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            object raw;
-            // 采集统一使用 03 读保持寄存器
-            Interlocked.Increment(ref _txCount);
-            ushort[] registers;
-            try
-            {
-                registers = await Task.Run(
-                    () => _master!.ReadHoldingRegisters(tag.SlaveId, tag.Address, tag.RegisterCount),
-                    cancellationToken).ConfigureAwait(false);
-                Interlocked.Increment(ref _rxCount);
-            }
-            catch (Exception ex)
-            {
-                result.Quality = "Bad";
-                result.ErrorMessage = ex.Message;
-                result.DisplayValue = "ERR";
-                return result;
-            }
-
-            raw = ParseRegisters(registers, tag.DataType);
-
-            result.RawValue = raw;
-            result.NumericValue = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
-            result.DisplayValue = FormatValue(raw, tag);
-            result.Quality = "Good";
-        }
-        catch (Exception ex)
-        {
-            result.Quality = "Bad";
-            result.ErrorMessage = ex.Message;
-            result.DisplayValue = "ERR";
-        }
-        finally
-        {
-            _lock.Release();
-        }
-
+        var slice = new ushort[tag.RegisterCount];
+        Array.Copy(registers, offset, slice, 0, tag.RegisterCount);
+        var raw = ParseRegisters(slice, tag.DataType);
+        result.RawValue = raw;
+        result.NumericValue = Convert.ToDouble(raw) * tag.Scale + tag.Offset;
+        result.DisplayValue = FormatValue(raw, tag);
+        result.Quality = "Good";
         return result;
     }
 

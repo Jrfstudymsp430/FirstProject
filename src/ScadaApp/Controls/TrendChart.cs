@@ -361,16 +361,16 @@ public sealed class TrendChart : FrameworkElement
 
     private void DrawGrid(DrawingContext dc, Rect plot, long tStart, long tEnd, double yMin, double yMax)
     {
-        var border = new Pen(new SolidColorBrush(Color.FromRgb(0x35, 0x48, 0x5E)), 1);
+        var border = new Pen(new SolidColorBrush(Color.FromRgb(0x52, 0x6A, 0x86)), 1);
         border.Brush.Freeze();
         border.Freeze();
-        var grid = new Pen(new SolidColorBrush(Color.FromArgb(0x55, 0x35, 0x48, 0x5E)), 1);
+        var grid = new Pen(new SolidColorBrush(Color.FromArgb(0x55, 0x52, 0x6A, 0x86)), 1);
         grid.Brush.Freeze();
         grid.Freeze();
 
         dc.DrawRectangle(null, border, plot);
         var dip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
-        var textBrush = new SolidColorBrush(Color.FromRgb(0xA8, 0xB6, 0xC6));
+        var textBrush = new SolidColorBrush(Color.FromRgb(0xC2, 0xCD, 0xD8));
         textBrush.Freeze();
 
         for (var i = 0; i <= 4; i++)
@@ -487,7 +487,7 @@ public sealed class TrendChart : FrameworkElement
             FlowDirection.LeftToRight,
             new Typeface("Microsoft YaHei UI"),
             13,
-            new SolidColorBrush(Color.FromRgb(0xA8, 0xB6, 0xC6)),
+            new SolidColorBrush(Color.FromRgb(0xC2, 0xCD, 0xD8)),
             dip);
         dc.DrawText(ft, new Point((width - ft.Width) / 2, (height - ft.Height) / 2));
     }

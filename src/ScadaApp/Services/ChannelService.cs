@@ -140,11 +140,12 @@ public sealed class ChannelService : IChannelService, IDisposable
             AddLog("Info", $"功能码 16 连续写入 {chunk.Count} 点 @{start}：{names}");
         }
 
-        foreach (var (tag, _) in ordered)
+        var written = ordered.Select(i => i.Tag).ToList();
+        var updated = await _client.ReadTagsAsync(written, cancellationToken).ConfigureAwait(false);
+        foreach (var value in updated)
         {
-            var updated = await _client.ReadTagAsync(tag, cancellationToken).ConfigureAwait(false);
-            _tagValues[tag.Id] = updated;
-            TagValueUpdated?.Invoke(this, updated);
+            _tagValues[value.TagId] = value;
+            TagValueUpdated?.Invoke(this, value);
         }
     }
 
@@ -153,37 +154,26 @@ public sealed class ChannelService : IChannelService, IDisposable
         while (!cancellationToken.IsCancellationRequested)
         {
             var enabledTags = _config.Tags.Where(t => t.IsEnabled).ToList();
-            foreach (var tag in enabledTags)
+            if (enabledTags.Count > 0 && _client != null)
             {
-                if (cancellationToken.IsCancellationRequested)
-                    break;
-
-                if (_client == null)
-                    continue;
-
                 try
                 {
-                    var value = await _client.ReadTagAsync(tag, cancellationToken).ConfigureAwait(false);
-                    _tagValues[tag.Id] = value;
-                    TagValueUpdated?.Invoke(this, value);
+                    var values = await _client.ReadTagsAsync(enabledTags, cancellationToken).ConfigureAwait(false);
+                    foreach (var value in values)
+                    {
+                        _tagValues[value.TagId] = value;
+                        TagValueUpdated?.Invoke(this, value);
+                    }
 
-                    if (value.Quality == "Bad" && value.ErrorMessage != null)
-                    {
-                        var previous = _lastErrors.GetValueOrDefault(tag.Id);
-                        if (previous != value.ErrorMessage)
-                        {
-                            _lastErrors[tag.Id] = value.ErrorMessage;
-                            AddLog("Warn", $"{tag.Name}: {value.ErrorMessage}");
-                        }
-                    }
-                    else
-                    {
-                        _lastErrors.TryRemove(tag.Id, out _);
-                    }
+                    ReportReadQuality(enabledTags, values);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    AddLog("Error", $"{tag.Name} 读取异常: {ex.Message}");
+                    AddLog("Error", $"块读取异常: {ex.Message}");
                 }
             }
 
@@ -195,6 +185,48 @@ public sealed class ChannelService : IChannelService, IDisposable
             catch (OperationCanceledException)
             {
                 break;
+            }
+        }
+    }
+
+    private void ReportReadQuality(IReadOnlyList<TagPoint> tags, IReadOnlyList<TagValue> values)
+    {
+        var bad = values.Where(v => v.Quality == "Bad" && !string.IsNullOrEmpty(v.ErrorMessage)).ToList();
+        if (bad.Count == 0)
+        {
+            foreach (var tag in tags)
+                _lastErrors.TryRemove(tag.Id, out _);
+            _lastErrors.TryRemove("__block__", out _);
+            return;
+        }
+
+        if (bad.Count == values.Count)
+        {
+            var msg = bad[0].ErrorMessage!;
+            if (_lastErrors.GetValueOrDefault("__block__") != msg)
+            {
+                _lastErrors["__block__"] = msg;
+                AddLog("Warn", $"块读取失败: {msg}");
+            }
+
+            return;
+        }
+
+        _lastErrors.TryRemove("__block__", out _);
+        foreach (var value in values)
+        {
+            if (value.Quality == "Bad" && value.ErrorMessage != null)
+            {
+                if (_lastErrors.GetValueOrDefault(value.TagId) != value.ErrorMessage)
+                {
+                    _lastErrors[value.TagId] = value.ErrorMessage;
+                    var name = tags.FirstOrDefault(t => t.Id == value.TagId)?.Name ?? value.TagId;
+                    AddLog("Warn", $"{name}: {value.ErrorMessage}");
+                }
+            }
+            else
+            {
+                _lastErrors.TryRemove(value.TagId, out _);
             }
         }
     }

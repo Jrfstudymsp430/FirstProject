@@ -24,6 +24,7 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private int _tagCount;
     [ObservableProperty] private int _goodTagCount;
     [ObservableProperty] private string _currentTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    [ObservableProperty] private bool _isTagTableVisible;
 
     private readonly DispatcherTimer _clock = new() { Interval = TimeSpan.FromSeconds(1) };
 
@@ -60,6 +61,12 @@ public partial class MainViewModel : ObservableObject
     {
         LoadConfigTags(value);
         RefreshSummary();
+    }
+
+    [RelayCommand]
+    private void ToggleTagTable()
+    {
+        IsTagTableVisible = !IsTagTableVisible;
     }
 
     [RelayCommand]
@@ -220,6 +227,7 @@ public partial class MainViewModel : ObservableObject
         _channelManager.UpdateChannel(SelectedChannel.Config);
         ConfigStorage.Save(_channelManager.Channels);
         ReloadAllTags();
+        IsTagTableVisible = true;
         StatusText = $"已添加标签: {tag.Name}";
     }
 
