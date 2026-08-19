@@ -445,8 +445,12 @@ public partial class MainViewModel : ObservableObject
         if (channel == null)
             return;
 
+        var n = 1;
         foreach (var tag in MonitorTags.Where(t => t.ChannelId == channel.Id))
+        {
+            tag.Ordinal = n++;
             Tags.Add(tag);
+        }
     }
 
     private void UpdateTagValue(TagValue value)

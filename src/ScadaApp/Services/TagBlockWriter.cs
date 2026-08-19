@@ -42,6 +42,7 @@ public static class TagBlockWriter
         return tag.DataType switch
         {
             TagDataType.UInt16 => ushort.Parse(input, CultureInfo.InvariantCulture),
+            TagDataType.Int32 => int.Parse(input, CultureInfo.InvariantCulture),
             TagDataType.Float32 => float.Parse(input, CultureInfo.InvariantCulture),
             TagDataType.Double64 => double.Parse(input, CultureInfo.InvariantCulture),
             _ => input

@@ -16,6 +16,7 @@ public partial class TagItemViewModel : ObservableObject
     [ObservableProperty] private DateTime _timestamp;
     [ObservableProperty] private string? _errorMessage;
     [ObservableProperty] private double? _numericValue;
+    [ObservableProperty] private int _ordinal;
 
     public TagItemViewModel(IChannelManager channelManager, ChannelConfig channel, TagPoint tag, TrendBuffer trend)
     {
@@ -41,6 +42,7 @@ public partial class TagItemViewModel : ObservableObject
     public string DataType => _tag.DataType switch
     {
         TagDataType.Float32 => "Float CDAB",
+        TagDataType.Int32 => "Int32 CDAB",
         TagDataType.Double64 => "Double GHEF CDAB",
         _ => "UInt16"
     };
@@ -71,6 +73,7 @@ public partial class TagItemViewModel : ObservableObject
         object parsed = _tag.DataType switch
         {
             TagDataType.UInt16 => ushort.Parse(input, CultureInfo.InvariantCulture),
+            TagDataType.Int32 => int.Parse(input, CultureInfo.InvariantCulture),
             TagDataType.Float32 => float.Parse(input, CultureInfo.InvariantCulture),
             TagDataType.Double64 => double.Parse(input, CultureInfo.InvariantCulture),
             _ => input

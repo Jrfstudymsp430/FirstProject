@@ -182,7 +182,7 @@
                     Margin="0,8,0,16"
                     FontSize="11"
                     Foreground="{StaticResource TextSecondary}"
-                    Text="从机ID在通道参数中设置；03 只读采集；06 写单寄存器；16 写多寄存器（Float CDAB / Double GHEF CDAB）"
+                    Text="从机ID在通道参数中设置；03 只读采集；06 写单寄存器；16 写多寄存器（Float/Int32 CDAB，Double GHEF CDAB）"
                     TextWrapping="Wrap" />
             </Grid>
 

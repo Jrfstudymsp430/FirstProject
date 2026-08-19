@@ -33,7 +33,7 @@
         <DataTemplate x:Key="MonitorTagCardTemplate">
             <Border Style="{StaticResource DataMonitorCard}">
                 <DockPanel>
-                    <Grid DockPanel.Dock="Top">
+                    <Grid MinHeight="24" DockPanel.Dock="Top">
                         <TextBlock
                             Margin="0,0,88,0"
                             VerticalAlignment="Center"
@@ -52,7 +52,7 @@
                                 Content="曲线"
                                 FontSize="11"
                                 Style="{StaticResource TableWriteButton}"
-                                Visibility="{Binding TrendEnabled, Converter={StaticResource BoolToVis}}" />
+                                Visibility="{Binding TrendEnabled, Converter={StaticResource BoolToHiddenVis}}" />
                             <Button
                                 Padding="6,1"
                                 Command="{Binding DataContext.WriteTagCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -60,7 +60,7 @@
                                 Content="写入"
                                 FontSize="11"
                                 Style="{StaticResource TableWriteButton}"
-                                Visibility="{Binding IsWritable, Converter={StaticResource BoolToVis}}" />
+                                Visibility="{Binding IsWritable, Converter={StaticResource BoolToHiddenVis}}" />
                         </StackPanel>
                     </Grid>
                     <StackPanel
@@ -630,6 +630,18 @@
                                         SelectionMode="Extended"
                                         SelectionUnit="FullRow">
                                         <DataGrid.Columns>
+                                            <DataGridTextColumn
+                                                Width="0.45*"
+                                                MinWidth="44"
+                                                Binding="{Binding Ordinal}"
+                                                Header="序号">
+                                                <DataGridTextColumn.HeaderStyle>
+                                                    <Style BasedOn="{StaticResource DataGridHeaderCenter}" TargetType="DataGridColumnHeader" />
+                                                </DataGridTextColumn.HeaderStyle>
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style BasedOn="{StaticResource DataGridCellCenter}" TargetType="TextBlock" />
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
                                             <DataGridTextColumn
                                                 Width="1.2*"
                                                 MinWidth="70"

@@ -17,6 +17,7 @@ public partial class InputDialog : Window
         HintText.Text = dataType.Contains("Double", StringComparison.OrdinalIgnoreCase)
             ? "按功能码 16 写入四个寄存器，字序 GHEF CDAB"
             : dataType.Contains("Float", StringComparison.OrdinalIgnoreCase)
+                || dataType.Contains("Int32", StringComparison.OrdinalIgnoreCase)
                 ? "按功能码 16 写入两个寄存器，字序 CDAB"
                 : "按功能码 06 写入单个保持寄存器";
         InputTextBox.Text = defaultValue;

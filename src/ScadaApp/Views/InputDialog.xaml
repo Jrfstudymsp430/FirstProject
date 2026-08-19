@@ -128,7 +128,7 @@
                     Margin="0,8,0,0"
                     FontSize="11"
                     Foreground="{StaticResource TextSecondary}"
-                    Text="写入保持寄存器；Float CDAB 两寄存器，Double GHEF CDAB 四寄存器" />
+                    Text="写入保持寄存器；Float/Int32 CDAB 两寄存器，Double GHEF CDAB 四寄存器" />
 
                 <StackPanel
                     Margin="0,18,0,0"

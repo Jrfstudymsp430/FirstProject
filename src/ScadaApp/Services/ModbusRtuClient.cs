@@ -214,6 +214,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
         return dataType switch
         {
             TagDataType.UInt16 => registers[0],
+            TagDataType.Int32 => RegistersToInt32Cdab(registers),
             TagDataType.Float32 => RegistersToFloatCdab(registers),
             TagDataType.Double64 => RegistersToDoubleGhefCdab(registers),
             _ => registers[0]
@@ -224,6 +225,7 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     {
         return dataType switch
         {
+            TagDataType.Int32 => Int32ToRegistersCdab(Convert.ToInt32(value)),
             TagDataType.Float32 => FloatToRegistersCdab(Convert.ToSingle(value)),
             TagDataType.Double64 => DoubleToRegistersGhefCdab(Convert.ToDouble(value)),
             _ => new[] { Convert.ToUInt16(value) }
@@ -248,6 +250,31 @@ public sealed class ModbusRtuClient : IModbusRtuClient
     }
 
     private static ushort[] FloatToRegistersCdab(float value)
+    {
+        var bytes = BitConverter.GetBytes(value);
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+
+        var cd = (ushort)((bytes[2] << 8) | bytes[3]);
+        var ab = (ushort)((bytes[0] << 8) | bytes[1]);
+        return new[] { cd, ab };
+    }
+
+    private static int RegistersToInt32Cdab(ushort[] registers)
+    {
+        var bytes = new[]
+        {
+            (byte)(registers[1] >> 8),
+            (byte)(registers[1] & 0xFF),
+            (byte)(registers[0] >> 8),
+            (byte)(registers[0] & 0xFF)
+        };
+        if (BitConverter.IsLittleEndian)
+            Array.Reverse(bytes);
+        return BitConverter.ToInt32(bytes, 0);
+    }
+
+    private static ushort[] Int32ToRegistersCdab(int value)
     {
         var bytes = BitConverter.GetBytes(value);
         if (BitConverter.IsLittleEndian)

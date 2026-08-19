@@ -1,7 +1,7 @@
 namespace ScadaApp.Models;
 
 /// <summary>
-/// SCADA 数据点。采集一律用 03；06/16 表示可写。Float32 为 CDAB，Double64 为 GHEF CDAB。
+/// SCADA 数据点。采集一律用 03；06/16 表示可写。Float32 / Int32 为 CDAB，Double64 为 GHEF CDAB。
 /// </summary>
 public class TagPoint
 {
@@ -23,7 +23,7 @@ public class TagPoint
 
     public ushort RegisterCount => DataType switch
     {
-        TagDataType.Float32 => 2,
+        TagDataType.Float32 or TagDataType.Int32 => 2,
         TagDataType.Double64 => 4,
         _ => 1
     };

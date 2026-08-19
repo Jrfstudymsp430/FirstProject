@@ -24,6 +24,7 @@ public partial class TagConfigDialog : Window
         DataTypeCombo.ItemsSource = new[]
         {
             TagDataType.Float32,
+            TagDataType.Int32,
             TagDataType.Double64,
             TagDataType.UInt16
         };
@@ -46,7 +47,7 @@ public partial class TagConfigDialog : Window
 
     private void DataTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (Point.DataType is TagDataType.Float32 or TagDataType.Double64
+        if (Point.RegisterCount > 1
             && Point.FunctionCode == ModbusFunctionCode.WriteSingleRegister)
             Point.FunctionCode = ModbusFunctionCode.WriteMultipleRegisters;
     }
@@ -62,7 +63,7 @@ public partial class TagConfigDialog : Window
         Point.Name = Point.Name?.Trim() ?? string.Empty;
         Point.Unit = Point.Unit?.Trim() ?? string.Empty;
         Point.DecimalPlaces = Math.Clamp(Point.DecimalPlaces, 0, 12);
-        if (Point.DataType is TagDataType.Float32 or TagDataType.Double64
+        if (Point.RegisterCount > 1
             && Point.FunctionCode == ModbusFunctionCode.WriteSingleRegister)
             Point.FunctionCode = ModbusFunctionCode.WriteMultipleRegisters;
         DialogResult = true;

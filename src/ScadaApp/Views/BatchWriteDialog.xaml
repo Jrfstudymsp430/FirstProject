@@ -156,7 +156,7 @@
                     Margin="0,4,0,0"
                     FontSize="11"
                     Foreground="{StaticResource TextSecondary}"
-                    Text="Float CDAB / Double GHEF CDAB；多点合并为一次 16 写多寄存器" />
+                    Text="Float / Int32 CDAB，Double GHEF CDAB；多点合并为一次 16 写多寄存器" />
 
                 <StackPanel
                     Margin="0,18,0,0"
