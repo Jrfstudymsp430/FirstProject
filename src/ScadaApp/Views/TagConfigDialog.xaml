@@ -62,6 +62,7 @@
                 <TextBox
                     Grid.Row="0"
                     Grid.Column="1"
+                    Padding="3,0,0,0"
                     VerticalAlignment="Center"
                     Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -89,6 +90,7 @@
                 <TextBox
                     Grid.Row="2"
                     Grid.Column="1"
+                    Padding="3,0,0,0"
                     VerticalAlignment="Center"
                     Text="{Binding Address, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -116,6 +118,7 @@
                 <TextBox
                     Grid.Row="4"
                     Grid.Column="1"
+                    Padding="3,0,0,0"
                     VerticalAlignment="Center"
                     Text="{Binding Unit, UpdateSourceTrigger=PropertyChanged}" />
 
@@ -123,7 +126,10 @@
                     Grid.Row="5"
                     Style="{StaticResource DialogFieldLabel}"
                     Text="比例 / 偏移" />
-                <Grid Grid.Row="5" Grid.Column="1" VerticalAlignment="Center">
+                <Grid
+                    Grid.Row="5"
+                    Grid.Column="1"
+                    VerticalAlignment="Center">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
@@ -131,6 +137,7 @@
                     </Grid.ColumnDefinitions>
                     <TextBox
                         Grid.Column="0"
+                        Padding="3,0,0,0"
                         Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
                         ToolTip="比例 Scale" />
                     <TextBlock
@@ -141,6 +148,7 @@
                         Text="/" />
                     <TextBox
                         Grid.Column="2"
+                        Padding="3,0,0,0"
                         Text="{Binding Offset, UpdateSourceTrigger=PropertyChanged}"
                         ToolTip="偏移 Offset" />
                 </Grid>

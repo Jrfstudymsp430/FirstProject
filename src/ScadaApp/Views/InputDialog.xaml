@@ -26,7 +26,7 @@
         BorderBrush="{StaticResource BorderColor}"
         BorderThickness="1">
         <DockPanel>
-            <!-- 标题栏 -->
+            <!--  标题栏  -->
             <Border
                 Height="40"
                 Background="{StaticResource BgCard}"
@@ -65,7 +65,7 @@
                 </Grid>
             </Border>
 
-            <!-- 内容 -->
+            <!--  内容  -->
             <StackPanel Margin="20,16,20,18">
                 <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>
