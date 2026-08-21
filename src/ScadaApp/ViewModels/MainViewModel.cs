@@ -105,6 +105,7 @@ public partial class MainViewModel : ObservableObject
             return;
 
         var name = SelectedChannel.Name;
+        CalibrationWindow.CloseIfOpen(SelectedChannel.Id);
         foreach (var tag in SelectedChannel.Config.Tags)
         {
             _trends.Remove(tag.Id);
@@ -379,6 +380,25 @@ public partial class MainViewModel : ObservableObject
         StatusText = $"已打开曲线: {tag.Name}";
     }
 
+    [RelayCommand]
+    private void ShowCalibration()
+    {
+        if (SelectedChannel == null)
+        {
+            MessageDialog.Alert("传感器标定", "请先选择一个通道。");
+            return;
+        }
+
+        if (SelectedChannel.Config.Tags.Count == 0)
+        {
+            MessageDialog.Alert("传感器标定", "该通道还没有点表，请先添加采集点。");
+            return;
+        }
+
+        CalibrationWindow.Show(SelectedChannel, _channelManager, Application.Current.MainWindow);
+        StatusText = $"已打开传感器标定: {SelectedChannel.Name}";
+    }
+
     private void LoadFromStorage()
     {
         foreach (var existing in _channelManager.Channels.ToList())
@@ -406,6 +426,7 @@ public partial class MainViewModel : ObservableObject
         SelectedChannel = Channels.FirstOrDefault(c => c.Id == selectedId) ?? Channels.FirstOrDefault();
         LoadConfigTags(SelectedChannel);
         SyncTrendWindows();
+        CalibrationWindow.RebindAll(Channels);
         RefreshSummary();
         ApplyConnectedStatusText();
     }
@@ -415,6 +436,7 @@ public partial class MainViewModel : ObservableObject
         RebuildMonitorTags();
         LoadConfigTags(SelectedChannel);
         SyncTrendWindows();
+        CalibrationWindow.RebindAll(Channels);
         RefreshSummary();
     }
 
@@ -559,6 +581,7 @@ public partial class MainViewModel : ObservableObject
     public async Task ShutdownAsync()
     {
         _clock.Stop();
+        CalibrationWindow.CloseAll();
         await _channelManager.StopAllAsync();
         ConfigStorage.Save(_channelManager.Channels);
     }

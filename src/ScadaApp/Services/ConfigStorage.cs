@@ -142,6 +142,17 @@ public static class ConfigStorage
                 if (!Enum.IsDefined(tag.DataType))
                     tag.DataType = TagDataType.Float32;
             }
+
+            if (channel.CalibrationSampleCount is not (5 or 8 or 10 or 15 or 20))
+                channel.CalibrationSampleCount = 8;
+            if (!Enum.IsDefined(channel.CalibrationDataType))
+                channel.CalibrationDataType = TagDataType.Float32;
+            if (!Enum.IsDefined(channel.CalibrationWriteMode))
+                channel.CalibrationWriteMode = CalibrationWriteMode.Table;
+            channel.CalibrationPoints ??= new List<CalibrationPoint>();
+            channel.CalibrationPoints.RemoveAll(p =>
+                double.IsNaN(p.Measured) || double.IsInfinity(p.Measured)
+                || double.IsNaN(p.Standard) || double.IsInfinity(p.Standard));
         }
     }
 

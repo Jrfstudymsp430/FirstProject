@@ -22,6 +22,13 @@ public partial class ChannelConfig : ObservableObject
 
     public List<TagPoint> Tags { get; set; } = new();
 
+    public string? CalibrationTagId { get; set; }
+    public int CalibrationSampleCount { get; set; } = 8;
+    public ushort CalibrationStartAddress { get; set; }
+    public TagDataType CalibrationDataType { get; set; } = TagDataType.Float32;
+    public CalibrationWriteMode CalibrationWriteMode { get; set; } = CalibrationWriteMode.Table;
+    public List<CalibrationPoint> CalibrationPoints { get; set; } = new();
+
     partial void OnNameChanged(string value)
     {
         var trimmed = value?.Trim() ?? string.Empty;

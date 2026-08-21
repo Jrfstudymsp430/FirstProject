@@ -9,7 +9,7 @@
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <RootNamespace>ScadaApp</RootNamespace>
-    <AssemblyName>ScadaApp</AssemblyName>
+    <AssemblyName>蜀谷厂家管理软件</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

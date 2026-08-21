@@ -142,4 +142,29 @@ public sealed class TrendBuffer
             return true;
         }
     }
+
+    public int CopyRecent(int take, double[] values, long[] ticks)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(ticks);
+        if (take <= 0 || values.Length == 0 || ticks.Length == 0)
+            return 0;
+
+        lock (_sync)
+        {
+            var n = Math.Min(take, Math.Min(_count, Math.Min(values.Length, ticks.Length)));
+            if (n == 0)
+                return 0;
+
+            var start = (_head + _count - n + Capacity) % Capacity;
+            for (var i = 0; i < n; i++)
+            {
+                var idx = (start + i) % Capacity;
+                values[i] = _values[idx];
+                ticks[i] = _ticks[idx];
+            }
+
+            return n;
+        }
+    }
 }

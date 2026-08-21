@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
     xmlns:vm="clr-namespace:ScadaApp.ViewModels"
-    Title="SCADA · Modbus RTU 多通道采集系统"
+    Title="Modbus RTU 多通道采集系统"
     Width="1120"
     Height="700"
     MinWidth="1000"
@@ -387,6 +387,11 @@
                                         Margin="0,0,0,8"
                                         Command="{Binding EditChannelCommand}"
                                         Content="通道参数"
+                                        Style="{StaticResource SecondaryButton}" />
+                                    <Button
+                                        Margin="0,0,0,8"
+                                        Command="{Binding ShowCalibrationCommand}"
+                                        Content="传感器标定"
                                         Style="{StaticResource SecondaryButton}" />
                                     <Button
                                         Margin="0,0,0,8"

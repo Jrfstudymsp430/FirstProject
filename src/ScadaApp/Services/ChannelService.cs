@@ -149,6 +149,35 @@ public sealed class ChannelService : IChannelService, IDisposable
         }
     }
 
+    public async Task WriteRegistersAsync(
+        ushort startAddress,
+        ushort[] registers,
+        CancellationToken cancellationToken = default)
+    {
+        if (_client == null)
+            throw new InvalidOperationException("通道未连接");
+
+        if (registers.Length == 0)
+            return;
+
+        if ((int)startAddress + registers.Length > 65536)
+            throw new InvalidOperationException("写入范围超出保持寄存器地址上限 65535。");
+
+        const int max = TagBlockWriter.MaxRegistersPerRequest;
+        var offset = 0;
+        while (offset < registers.Length)
+        {
+            var count = Math.Min(max, registers.Length - offset);
+            var chunk = new ushort[count];
+            Array.Copy(registers, offset, chunk, 0, count);
+            var address = (ushort)(startAddress + offset);
+            await _client.WriteRegistersAsync(_config.SlaveId, address, chunk, cancellationToken)
+                .ConfigureAwait(false);
+            AddLog("Info", $"功能码 16 写入 {count} 个寄存器 @{address}");
+            offset += count;
+        }
+    }
+
     private async Task PollLoopAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
